@@ -221,9 +221,10 @@ export default function page() {
       return highest !== undefined ? [handType, highest] : [handType]
     }
   
+    //fetch cards from db and distribute
   
     return <>
-      <nav className="flex flex-row flex-nowrap h-[14vh] justify-evenly w-[100vw] border-b-2 border-gray-600">
+      <nav className="flex flex-row flex-nowrap h-[14vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
                 <h1 className="text-4xl inline mx-auto top-[3vh] font-extrabold relative">Card Cade</h1>    
             </Link>
