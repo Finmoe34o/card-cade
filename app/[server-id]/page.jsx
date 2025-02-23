@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 export default function page() {
     const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
     const hand = []
@@ -221,6 +223,11 @@ export default function page() {
   
   
     return <>
+      <nav className="flex flex-row flex-nowrap h-[14vh] justify-evenly w-[100vw] border-b-2 border-gray-600">
+            <Link className="inline" href="/">
+                <h1 className="text-4xl inline mx-auto top-[3vh] font-extrabold relative">Card Cade</h1>    
+            </Link>
+      </nav>
       <div className="w-[100vw] absolute top-[70vh] h-[30vh]">
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] w-[80px]">{cardGen("hand")}</div>
