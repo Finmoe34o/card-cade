@@ -1,7 +1,14 @@
 import Link from "next/link"
+import { createClient } from '@/utils/supabase/server';
+import { headers } from "next/headers";
 
-export default function page() {
-    const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
+export default async function page() {
+    const headerList = await headers()
+    const pathname = await headerList.get("x-current-path");
+    console.log(pathname);
+
+    /*correctly get the cards for each player and shiz*/
+
     const hand = []
     const river = []
     const cardFunct = (suit, num) => {
@@ -54,16 +61,8 @@ export default function page() {
       </div>
     }
   
-    const cardGen = (type) => {
-      let num1 = Math.ceil(Math.random() * 4)
-      let suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
-      let num2
-      while (cards[suit][num2] === undefined) {
-        num2 = Math.floor(Math.random() * 13)
-      }
-      const card = cards[suit][num2]
-      delete cards[suit][num2]
-      type === "hand" ? hand.push(suit, `${card}`) : river.push(suit, `${card}`)
+    const cardGen = (type,num,playerNum) => {
+      
       return <>
         {cardFunct(suit, card)}
       </>
@@ -229,23 +228,23 @@ export default function page() {
                 <h1 className="text-4xl inline mx-auto top-[3vh] font-extrabold relative">Card Cade</h1>    
             </Link>
       </nav>
-      <div className="w-[100vw] absolute top-[70vh] h-[30vh]">
+      {pathname}
+      {/*<div className="w-[100vw] absolute top-[70vh] h-[30vh]">
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
-          <div className="relative -rotate-[10deg] mx-auto -left-[30px] w-[80px]">{cardGen("hand")}</div>
-          <div className="relative rotate-[10deg] mx-auto -top-[120px] left-[30px] w-[80px]">{cardGen("hand")}</div>
+          <div className="relative -rotate-[10deg] mx-auto -left-[30px] w-[80px]">{cardGen("hand",1)}</div>
+          <div className="relative rotate-[10deg] mx-auto -top-[120px] left-[30px] w-[80px]">{cardGen("hand",2)}</div>
         </div>
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[30vh] top-[35vh]">
         <div className="mx-auto flex">
-          <div className="mx-1">{cardGen("river")}</div>
-          <div className="mx-1">{cardGen("river")}</div>
-          <div className="mx-1">{cardGen("river")}</div>
-          <div className="mx-1">{cardGen("river")}</div>
-          <div className="mx-1">{cardGen("river")}</div>
+          <div className="mx-1">{cardGen("river",1)}</div>
+          <div className="mx-1">{cardGen("river",2)}</div>
+          <div className="mx-1">{cardGen("river",3)}</div>
+          <div className="mx-1">{cardGen("river",4)}</div>
+          <div className="mx-1">{cardGen("river",5)}</div>
         </div>
-      </div>
+      </div>*/}
     </>
-  
   }
   
   
