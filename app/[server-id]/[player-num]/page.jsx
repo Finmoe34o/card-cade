@@ -5,10 +5,13 @@ import { headers } from "next/headers";
 export default async function page() {
     const headerList = await headers()
     const pathname = await headerList.get("x-current-path");
-    console.log(pathname);
-
+    const serverNum = pathname[1]
+    const playerNum = pathname[3]
+    const supabase = await createClient()
+    const { data: servers} = await supabase
+        .from("servers")
+        .select("*")
     /*correctly get the cards for each player and shiz*/
-
     const hand = []
     const river = []
     const cardFunct = (suit, num) => {
@@ -61,13 +64,49 @@ export default async function page() {
       </div>
     }
   
-    const cardGen = (type,num,playerNum) => {
-      
+    const cardGen = (type) => {
+      const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
+      let num1 = Math.ceil(Math.random() * 4)
+      let suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
+      let num2
+      while (servers) {
+          num2 = Math.floor(Math.random() * 13)
+          num1 = Math.ceil(Math.random() * 4)
+          suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
+      }
+      const card = cards[suit][num2]
+      delete cards[suit][num2]
+      type === "hand" ? hand.push(suit, `${card}`) : river.push(suit, `${card}`)
       return <>
         {cardFunct(suit, card)}
       </>
     }
-  
+
+    const generateCards = async (serverNum, playerNum) => {
+      if (playerNum === "1") {
+          for (let i = 1; i < 6; i++) {
+              cardGen("river",i)
+          }
+          
+          const { data, error } = await supabase
+              .from('servers')
+              .update({ river: river })
+              .eq('id', serverNum)
+              .select()
+      }
+      cardGen("hand",1)
+      cardGen("hand",2)
+      hand.push(playerNum)
+      const { data, error } = await supabase
+              .from('servers')
+              .update({ player_cards: hand })
+              .eq('id', serverNum)
+              .select()
+    }
+    if (servers[serverNum - 1].player_cards.length <= playerNum * 5) {
+      generateCards(serverNum, playerNum)
+    }
+
     const cardCheck = () => {
       let handType = "high"
       const pairNumsArr = []
@@ -220,30 +259,42 @@ export default async function page() {
       return highest !== undefined ? [handType, highest] : [handType]
     }
   
+    const cardFetch = async (type, num) => {
+      let suit
+      let card
+      if (type === "river") {
+        suit = servers[serverNum - 1].river[(num - 1) * 2]
+        card = servers[serverNum - 1].river[(num * 2) - 1]
+      } else {
+        suit = servers[serverNum - 1].player_cards[(num - 1) * 2]
+        card = servers[serverNum - 1].player_cards[(num * 2) - 1]
+      }
+        console.log(suit, card)
+      return cardFunct(suit, card);
+    }
+
     //fetch cards from db and distribute
-  
     return <>
       <nav className="flex flex-row flex-nowrap h-[14vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
                 <h1 className="text-4xl inline mx-auto top-[3vh] font-extrabold relative">Card Cade</h1>    
             </Link>
       </nav>
-      {pathname}
-      {/*<div className="w-[100vw] absolute top-[70vh] h-[30vh]">
+      <div className="w-[100vw] absolute top-[70vh] h-[30vh]">
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
-          <div className="relative -rotate-[10deg] mx-auto -left-[30px] w-[80px]">{cardGen("hand",1)}</div>
-          <div className="relative rotate-[10deg] mx-auto -top-[120px] left-[30px] w-[80px]">{cardGen("hand",2)}</div>
+          <div className="relative -rotate-[10deg] mx-auto -left-[30px] w-[80px]">{cardFetch("player_cards",1)}</div>
+          <div className="relative rotate-[10deg] mx-auto -top-[120px] left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
         </div>
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[30vh] top-[35vh]">
         <div className="mx-auto flex">
-          <div className="mx-1">{cardGen("river",1)}</div>
-          <div className="mx-1">{cardGen("river",2)}</div>
-          <div className="mx-1">{cardGen("river",3)}</div>
-          <div className="mx-1">{cardGen("river",4)}</div>
-          <div className="mx-1">{cardGen("river",5)}</div>
+          <div className="mx-1">{cardFetch("river",1)}</div>
+          <div className="mx-1">{cardFetch("river",2)}</div>
+          <div className="mx-1">{cardFetch("river",3)}</div>
+          <div className="mx-1">{cardFetch("river",4)}</div>
+          <div className="mx-1">{cardFetch("river",5)}</div>
         </div>
-      </div>*/}
+      </div>
     </>
   }
   

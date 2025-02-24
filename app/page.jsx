@@ -33,44 +33,6 @@ export default async function page() {
             .eq("id", serverNum)
 
     }
-
-    const cardGen = (type,num) => {
-        const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
-        let num1 = Math.ceil(Math.random() * 4)
-        let suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
-        let num2
-        while (cards[suit][num2] === undefined) {
-            num2 = Math.floor(Math.random() * 13)
-            num1 = Math.ceil(Math.random() * 4)
-            suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
-        }
-        const card = cards[suit][num2]
-        delete cards[suit][num2]
-        type === "hand" ? hand.push(suit, `${card}`) : river.push(suit, `${card}`)
-    }
-        
-
-    const generateCards = async (serverNum, playerNum) => {
-        if (playerNum === 1) {
-            for (let i = 1; i < 6; i++) {
-                cardGen("river",i)
-            }
-            const { data, error } = await supabase
-                .from('servers')
-                .update({ river: river })
-                .eq('id', serverNum)
-                .select()
-        }
-        cardGen("hand",1)
-        cardGen("hand",2)
-        hand.push(playerNum)
-        const { data, error } = await supabase
-                .from('servers')
-                .update({ player_cards: hand })
-                .eq('id', serverNum)
-                .select()
-        
-    }
     
     const findServer = () => {
         let serverNum
@@ -86,10 +48,7 @@ export default async function page() {
             newServer(servers.length + 1)
             serverNum = servers.length + 1
         }
-        if (playerNum === 1) {
-            generateCards(serverNum, playerNum)
-        }
-        //iteratePlayerNum(playerNum,serverNum) !!!!!!!!!
+        //iteratePlayerNum(playerNum,serverNum) !!!!!!!!! this is the code just remove the comment
         return `/${serverNum}/${playerNum}`
     }
  
