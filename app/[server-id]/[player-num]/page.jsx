@@ -68,12 +68,28 @@ export default async function page() {
       const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
       let num1 = Math.ceil(Math.random() * 4)
       let suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
-      let num2
-      while (servers) {
-          num2 = Math.floor(Math.random() * 13)
-          num1 = Math.ceil(Math.random() * 4)
-          suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
-      }
+      let num2 
+      let copy = true
+      while (copy) {
+        copy = false
+        num2 = Math.floor(Math.random() * 13)
+        for (let i = 0; i < 10;i = i + 2) {
+          if (servers[serverNum - 1].river[i] === null || (servers[serverNum - 1].river[i] === suit && servers[serverNum - 1].river[i + 1] === num2)) {
+            copy = true
+            break
+          }
+        } if (!copy) {
+          for (let i = 0; i < 30; i = i + 2) {
+            if (i % 5 === 0) {
+              i++
+            } else if (servers[serverNum - 1].player_cards[i] === null || (servers[serverNum - 1].player_cards[i] === suit && servers[serverNum - 1].player_cards[i + 1] === num2)) {
+              copy = true
+              break
+            }
+          }
+        }
+      }  
+
       const card = cards[suit][num2]
       delete cards[suit][num2]
       type === "hand" ? hand.push(suit, `${card}`) : river.push(suit, `${card}`)
@@ -94,19 +110,20 @@ export default async function page() {
               .eq('id', serverNum)
               .select()
       }
-      cardGen("hand",1)
-      cardGen("hand",2)
-      hand.push(playerNum)
+      for (let i = 1; i < 7; i++) {
+        cardGen("hand",1)
+        cardGen("hand",2)
+        hand.push(i)
+      }
       const { data, error } = await supabase
               .from('servers')
               .update({ player_cards: hand })
               .eq('id', serverNum)
               .select()
     }
-    if (servers[serverNum - 1].player_cards.length <= playerNum * 5) {
+    if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
       generateCards(serverNum, playerNum)
     }
-
     const cardCheck = () => {
       let handType = "high"
       const pairNumsArr = []
@@ -215,6 +232,41 @@ export default async function page() {
           return spadesArr.length >= 5 ? spadesArr : heartsArr.length >= 5 ? heartsArr : diamondsArr.length >= 5 ? diamondsArr : clubsArr.length >= 5 ? clubsArr : false
   
         }
+
+
+
+
+
+            /*
+    add the different values to the hand and river arrs so that the card check can work 
+  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
         const straightFlushCheck = (straightLength, straightEnd, sorted, flushArr) => {
           let count = 0
@@ -266,11 +318,11 @@ export default async function page() {
         suit = servers[serverNum - 1].river[(num - 1) * 2]
         card = servers[serverNum - 1].river[(num * 2) - 1]
       } else {
-        suit = servers[serverNum - 1].player_cards[(num - 1) * 2]
-        card = servers[serverNum - 1].player_cards[(num * 2) - 1]
+        const cardNum  = (playerNum - 1) * 5 + ((num - 1) * 2)
+        suit = servers[serverNum - 1].player_cards[cardNum]
+        card = servers[serverNum - 1].player_cards[cardNum + 1]
       }
-        console.log(suit, card)
-      return cardFunct(suit, card);
+      return cardFunct(suit, card); 
     }
 
     //fetch cards from db and distribute
@@ -283,7 +335,7 @@ export default async function page() {
       <div className="w-[100vw] absolute top-[70vh] h-[30vh]">
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] w-[80px]">{cardFetch("player_cards",1)}</div>
-          <div className="relative rotate-[10deg] mx-auto -top-[120px] left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
+          <div className="relative rotate-[10deg] mx-auto -top-[120px] left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
         </div>
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[30vh] top-[35vh]">
@@ -295,8 +347,6 @@ export default async function page() {
           <div className="mx-1">{cardFetch("river",5)}</div>
         </div>
       </div>
+      <div className="text-white">{cardCheck()}{river}{hand}</div>
     </>
   }
-  
-  
-  
