@@ -291,7 +291,8 @@ export default async function page() {
       return cardFunct(suit, card); 
     }
 
-    //fetch cards from db and distribute
+    let turn = 1
+
     return <>
       <nav className="flex flex-row flex-nowrap h-[8vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
@@ -302,29 +303,47 @@ export default async function page() {
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
-          <div className="mx-auto relative -top-[115px] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+          <div className={`relative -top-[115px] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
         </div>
       </div>
       <div className="w-[100vw] h-[100vh]">
         <div className=" absolute left-[15vw] top-[70vh]">
           <div className={`${servers[serverNum - 1].players >= 2 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
         </div>
         <div className="absolute left-[15vw] top-[14vh]">
           <div className={`${servers[serverNum - 1].players >= 3 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
         </div>
         <div className="relative top-[6vh]">
           <div className={`${servers[serverNum - 1].players >= 4 ? "block" : "block"} bg-gray-600 mx-auto flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="relative top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white mx-auto"></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
         </div>
         <div className="absolute right-[15vw] top-[14vh]">
           <div className={`${servers[serverNum - 1].players >= 5 ? "block" : "block"}  bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
         </div>
         <div className="absolute right-[15vw] top-[70vh]">
           <div className={`${servers[serverNum - 1].players >= 6 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
         </div>
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[42.5vh]">
