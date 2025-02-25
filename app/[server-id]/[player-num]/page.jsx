@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { createClient } from '@/utils/supabase/server';
 import { headers } from "next/headers";
+import ActionButtons from "../../../components/actionButtons"
 
 export default async function page() {
     const headerList = await headers()
@@ -291,62 +292,42 @@ export default async function page() {
       return cardFunct(suit, card); 
     }
 
-    let turn = 1
+    let turn = 2
 
     return <>
-      <nav className="flex flex-row flex-nowrap h-[8vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
+      <nav className="flex flex-row flex-nowrap h-[7vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
-                <h1 className="text-4xl inline mx-auto top-[1vh] font-extrabold relative">Card Cade</h1>    
+                <h1 className="text-3xl inline mx-auto top-[1vh] font-extrabold relative">Card Cade {}</h1>    
             </Link>
       </nav>
-      <div className="w-[100vw] absolute top-[70vh] h-[30vh]">
+      <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
-          <div className="relative -rotate-[10deg] mx-auto -left-[30px] -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
-          <div className="relative rotate-[10deg] mx-auto -top-[130px] left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
-          <div className={`relative -top-[115px] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
+          <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
+          <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
+          <div className="border-2 text-white absolute left-0 top-0 w-[50vw] h-[20vw] bg-red-500 z-50 border-green-600">
+            <ActionButtons />s
           </div>
         </div>
       </div>
       <div className="w-[100vw] h-[100vh]">
-        <div className=" absolute left-[15vw] top-[70vh]">
-          <div className={`${servers[serverNum - 1].players >= 2 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
+        <div className=" absolute left-[15vw] top-[65vh]">
+          <div className={`${servers[serverNum - 1].players >= 2 ? "block" : "block"} ${Number(playerNum) < 6 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
         </div>
-        <div className="absolute left-[15vw] top-[14vh]">
-          <div className={`${servers[serverNum - 1].players >= 3 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
+        <div className="absolute left-[15vw] top-[9vh]">
+          <div className={`${servers[serverNum - 1].players >= 3 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
         </div>
-        <div className="relative top-[6vh]">
-          <div className={`${servers[serverNum - 1].players >= 4 ? "block" : "block"} bg-gray-600 mx-auto flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
+        <div className="relative top-[2vh]">
+          <div className={`mx-auto ${servers[serverNum - 1].players >= 4 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
         </div>
-        <div className="absolute right-[15vw] top-[14vh]">
-          <div className={`${servers[serverNum - 1].players >= 5 ? "block" : "block"}  bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
+        <div className="absolute right-[15vw] top-[9vh]">
+          <div className={`${servers[serverNum - 1].players >= 5 ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
         </div>
-        <div className="absolute right-[15vw] top-[70vh]">
-          <div className={`${servers[serverNum - 1].players >= 6 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${turn === Number(playerNum) ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
+        <div className="absolute right-[15vw] top-[65vh]">
+          <div className={`${servers[serverNum - 1].players >= 6 ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
         </div>
       </div>
-      <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[42.5vh]">
+      <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">
         <div className="mx-auto flex">
           <div className="mx-1">{cardFetch("river",1)}</div>
           <div className="mx-1">{cardFetch("river",2)}</div>
@@ -357,3 +338,39 @@ export default async function page() {
       </div>
     </>
   }
+
+  /*<div className=" absolute left-[15vw] top-[65vh]">
+          <div className={`${servers[serverNum - 1].players >= 2 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 6 ? turn === Number(playerNum) + 1 ? "block" : "hidden" : turn  === Number(playerNum) - 5 ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
+        </div>
+        <div className="absolute left-[15vw] top-[9vh]">
+          <div className={`${servers[serverNum - 1].players >= 3 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 5 ? turn === Number(playerNum) + 2 ? "block" : "hidden" : turn  === Number(playerNum) - 4 ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
+        </div>
+        <div className="relative top-[2vh]">
+          <div className={`${servers[serverNum - 1].players >= 4 ? "block" : "block"} bg-gray-600 mx-auto flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 4 ? turn === Number(playerNum) + 3 ? "block" : "hidden" : turn  === Number(playerNum) - 3 ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
+        </div>
+        <div className="absolute right-[15vw] top-[9vh]">
+          <div className={`${servers[serverNum - 1].players >= 5 ? "block" : "block"}  bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 3 ? turn === Number(playerNum) + 4 ? "block" : "hidden" : turn  === Number(playerNum) - 2 ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
+        </div>
+        <div className="absolute right-[15vw] top-[65vh]">
+          <div className={`${servers[serverNum - 1].players >= 6 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 2 ? turn === Number(playerNum) + 5 ? "block" : "hidden" : turn  === Number(playerNum) - 1 ? "block" : "hidden"}`}>
+            <div className="absolute w-[120px] h-[25px] bg-white"></div>
+            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
+          </div>
+        </div>*/
