@@ -11,7 +11,6 @@ export default async function page() {
     const { data: servers} = await supabase
         .from("servers")
         .select("*")
-    /*correctly get the cards for each player and shiz*/
     const hand = []
     const river = []
     const cardFunct = (suit, num) => {
@@ -182,7 +181,6 @@ export default async function page() {
         }
       }
       // do pair and stuff comparison
-  
       const straightAndFlushCheck = () => {
         const cardValsArr = ["J", "Q", "K", "A"]
         const straightCheck = () => {
@@ -232,42 +230,6 @@ export default async function page() {
           return spadesArr.length >= 5 ? spadesArr : heartsArr.length >= 5 ? heartsArr : diamondsArr.length >= 5 ? diamondsArr : clubsArr.length >= 5 ? clubsArr : false
   
         }
-
-
-
-
-
-            /*
-    add the different values to the hand and river arrs so that the card check can work 
-  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
         const straightFlushCheck = (straightLength, straightEnd, sorted, flushArr) => {
           let count = 0
           for (let i = 0; i < straightLength; i++) {
@@ -317,28 +279,55 @@ export default async function page() {
       if (type === "river") {
         suit = servers[serverNum - 1].river[(num - 1) * 2]
         card = servers[serverNum - 1].river[(num * 2) - 1]
+        river.push(suit)
+        river.push(card)
       } else {
         const cardNum  = (playerNum - 1) * 5 + ((num - 1) * 2)
         suit = servers[serverNum - 1].player_cards[cardNum]
         card = servers[serverNum - 1].player_cards[cardNum + 1]
+        hand.push(suit),
+        hand.push(card)
       }
       return cardFunct(suit, card); 
     }
 
     //fetch cards from db and distribute
     return <>
-      <nav className="flex flex-row flex-nowrap h-[14vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
+      <nav className="flex flex-row flex-nowrap h-[8vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
-                <h1 className="text-4xl inline mx-auto top-[3vh] font-extrabold relative">Card Cade</h1>    
+                <h1 className="text-4xl inline mx-auto top-[1vh] font-extrabold relative">Card Cade</h1>    
             </Link>
       </nav>
       <div className="w-[100vw] absolute top-[70vh] h-[30vh]">
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
-          <div className="relative -rotate-[10deg] mx-auto -left-[30px] w-[80px]">{cardFetch("player_cards",1)}</div>
-          <div className="relative rotate-[10deg] mx-auto -top-[120px] left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
+          <div className="relative -rotate-[10deg] mx-auto -left-[30px] -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
+          <div className="relative rotate-[10deg] mx-auto -top-[130px] left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
+          <div className="mx-auto relative -top-[115px] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
         </div>
       </div>
-      <div className="flex w-[60vw] absolute left-[20vw] h-[30vh] top-[35vh]">
+      <div className="w-[100vw] h-[100vh]">
+        <div className=" absolute left-[15vw] top-[70vh]">
+          <div className={`${servers[serverNum - 1].players >= 2 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+        </div>
+        <div className="absolute left-[15vw] top-[14vh]">
+          <div className={`${servers[serverNum - 1].players >= 3 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+        </div>
+        <div className="relative top-[6vh]">
+          <div className={`${servers[serverNum - 1].players >= 4 ? "block" : "block"} bg-gray-600 mx-auto flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="relative top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white mx-auto"></div>
+        </div>
+        <div className="absolute right-[15vw] top-[14vh]">
+          <div className={`${servers[serverNum - 1].players >= 5 ? "block" : "block"}  bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+        </div>
+        <div className="absolute right-[15vw] top-[70vh]">
+          <div className={`${servers[serverNum - 1].players >= 6 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="relative mx-auto top-[1vh] w-[100px] h-[25px] rounded-xl border-black bg-white"></div>
+        </div>
+      </div>
+      <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[42.5vh]">
         <div className="mx-auto flex">
           <div className="mx-1">{cardFetch("river",1)}</div>
           <div className="mx-1">{cardFetch("river",2)}</div>
@@ -347,6 +336,5 @@ export default async function page() {
           <div className="mx-1">{cardFetch("river",5)}</div>
         </div>
       </div>
-      <div className="text-white">{cardCheck()}{river}{hand}</div>
     </>
   }
