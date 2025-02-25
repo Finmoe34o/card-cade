@@ -339,38 +339,4 @@ export default async function page() {
     </>
   }
 
-  /*<div className=" absolute left-[15vw] top-[65vh]">
-          <div className={`${servers[serverNum - 1].players >= 2 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 6 ? turn === Number(playerNum) + 1 ? "block" : "hidden" : turn  === Number(playerNum) - 5 ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
-        </div>
-        <div className="absolute left-[15vw] top-[9vh]">
-          <div className={`${servers[serverNum - 1].players >= 3 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 5 ? turn === Number(playerNum) + 2 ? "block" : "hidden" : turn  === Number(playerNum) - 4 ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
-        </div>
-        <div className="relative top-[2vh]">
-          <div className={`${servers[serverNum - 1].players >= 4 ? "block" : "block"} bg-gray-600 mx-auto flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 4 ? turn === Number(playerNum) + 3 ? "block" : "hidden" : turn  === Number(playerNum) - 3 ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
-        </div>
-        <div className="absolute right-[15vw] top-[9vh]">
-          <div className={`${servers[serverNum - 1].players >= 5 ? "block" : "block"}  bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 3 ? turn === Number(playerNum) + 4 ? "block" : "hidden" : turn  === Number(playerNum) - 2 ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
-        </div>
-        <div className="absolute right-[15vw] top-[65vh]">
-          <div className={`${servers[serverNum - 1].players >= 6 ? "block" : "block"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className={`relative top-[1vh] w-[120px] h-[25px] mx-auto ${Number(playerNum) < 2 ? turn === Number(playerNum) + 5 ? "block" : "hidden" : turn  === Number(playerNum) - 1 ? "block" : "hidden"}`}>
-            <div className="absolute w-[120px] h-[25px] bg-white"></div>
-            <div className={`absolute h-[25px] border-[1px] border-r-0 border-white z-10 animate-loading-bar bg-black`} ></div>
-          </div>
-        </div>*/
+  /**/
