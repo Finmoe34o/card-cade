@@ -15,7 +15,7 @@ export default async function page() {
     const hand = []
     const river = []
     const activePlayers = servers[serverNum - 1].activePlayers
-    let turn = 1
+    const turn = servers[serverNum - 1].turn
     let minBet = 2
     let stackSize = 100
     let potSize = 2
@@ -296,12 +296,17 @@ export default async function page() {
       }
       return cardFunct(suit, card); 
     }
-
+    if (turn === null || turn === undefined || turn === 7) {
+      const { data, error } = await supabase
+              .from('servers')
+              .update({ "turn": 1 })
+              .eq('id', serverNum)
+    }
     if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
       generateCards(serverNum, playerNum)
     } 
     if (turn === 1) {
-      round++
+      round === 5 ? round = 1 : round++
     }  
     if (activePlayers === undefined && round === 1) {
       const arr = []
@@ -311,7 +316,7 @@ export default async function page() {
       console.log(arr)
       const { data, error } = await supabase
               .from('servers')
-              .update({ active_players: arr })
+              .update({ "active_players": arr })
               .eq('id', serverNum)
     }
 
@@ -350,11 +355,11 @@ export default async function page() {
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">
         <div className="mx-auto flex">
-          <div className="mx-1">{cardFetch("river",1)}</div>
-          <div className="mx-1">{cardFetch("river",2)}</div>
-          <div className="mx-1">{cardFetch("river",3)}</div>
-          <div className="mx-1">{cardFetch("river",4)}</div>
-          <div className="mx-1">{cardFetch("river",5)}</div>
+          <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",1)}</div>
+          <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",2)}</div>
+          <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",3)}</div>
+          <div className={`mx-1 ${round >= 3 ? "block" : "hidden"}`}>{cardFetch("river",4)}</div>
+          <div className={`mx-1 ${round >= 4 ? "block" : "hidden"}`}>{cardFetch("river",5)}</div>
         </div>
       </div>
     </>
