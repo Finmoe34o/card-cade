@@ -3,26 +3,23 @@
 import {useState} from "react"
 import { sendValuesToServer } from "../app/actions";
 
-export default function page({minBet, turn, pot, stackSize}) {
+export default function page({minBet, turn, pot, stackSize, serverNum, playerNum}) {
     const [bet, setBet] = useState(0)
     const [betSize, setBetSize] = useState(0)
     const [menuOpen, setMenuOpen] = useState(false)
     const [load, setLoad] = useState(false)
     const foldFunct = async() => {
-        turn++
-        await sendValuesToServer(bet)
+        await sendValuesToServer(0,serverNum,playerNum)
     }
 
-    const checkCallFunct = async (minBet) => {
-        turn++
-        await sendValuesToServer(bet);
+    const checkCallFunct = async () => {
+        await sendValuesToServer(minBet,serverNum,playerNum);
     }
 
     const raiseFunct = async () => {
         setBet(betSize);
-        turn++
-        await sendValuesToServer(bet)
-        setBetSize(0)
+        setBetSize(-1)
+        await sendValuesToServer(bet,serverNum,playerNum)
     }
 
     const [mouseY, setMouseY] = useState(0)

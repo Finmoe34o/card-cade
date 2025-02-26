@@ -2,7 +2,6 @@ import Link from "next/link"
 import { createClient } from '@/utils/supabase/server';
 import { headers } from "next/headers";
 import ActionButtons from "../../../components/actionButtons"
-import { sendValuesToServer } from "../../actions";
 
 export default async function page() {
     const headerList = await headers()
@@ -15,6 +14,12 @@ export default async function page() {
         .select("*")
     const hand = []
     const river = []
+    const activePlayers = servers[serverNum - 1].activePlayers
+    let turn = 1
+    let minBet = 2
+    let stackSize = 100
+    let potSize = 2
+    let round = 0
     const cardFunct = (suit, num) => {
       const spade = () => {
         return <>
@@ -81,7 +86,7 @@ export default async function page() {
           }
         } if (!copy) {
           for (let i = 0; i < 30; i = i + 2) {
-            if (i % 5 === 0) {
+            if (i % 5 === 0 && i > 0) {
               i++
             } else if (servers[serverNum - 1].player_cards[i] === null || (servers[serverNum - 1].player_cards[i] === suit && servers[serverNum - 1].player_cards[i + 1] === num2)) {
               copy = true
@@ -90,16 +95,21 @@ export default async function page() {
           }
         }
       }  
-
       const card = cards[suit][num2]
       delete cards[suit][num2]
-      type === "hand" ? hand.push(suit, `${card}`) : river.push(suit, `${card}`)
+      type === "hand" ? (hand.push(suit, `${card}`)) : river.push(suit, `${card}`)
       return <>
         {cardFunct(suit, card)}
       </>
     }
 
     const generateCards = async (serverNum, playerNum) => {
+      for (let i = 0; i < hand.length; i++) {
+        hand.pop()
+      }
+      for (let i = 0; i < river.length; i++) {
+        river.pop()
+      }
       if (playerNum === "1") {
           for (let i = 1; i < 6; i++) {
               cardGen("river",i)
@@ -122,9 +132,7 @@ export default async function page() {
               .eq('id', serverNum)
               .select()
     }
-    if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
-      generateCards(serverNum, playerNum)
-    }
+
     const cardCheck = () => {
       let handType = "high"
       const pairNumsArr = []
@@ -281,22 +289,32 @@ export default async function page() {
       if (type === "river") {
         suit = servers[serverNum - 1].river[(num - 1) * 2]
         card = servers[serverNum - 1].river[(num * 2) - 1]
-        river.push(suit)
-        river.push(card)
       } else {
         const cardNum  = (playerNum - 1) * 5 + ((num - 1) * 2)
         suit = servers[serverNum - 1].player_cards[cardNum]
         card = servers[serverNum - 1].player_cards[cardNum + 1]
-        hand.push(suit),
-        hand.push(card)
       }
       return cardFunct(suit, card); 
     }
 
-    let turn = 1
-    let minBet = 2
-    let stackSize = 2
-    let potSize = 2
+    if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
+      generateCards(serverNum, playerNum)
+    } 
+    if (turn === 1) {
+      round++
+    }  
+    if (activePlayers === undefined && round === 1) {
+      const arr = []
+      for (let i = 1; i < servers[serverNum - 1].players + 1; i++) {
+        arr.push(i)
+      }
+      console.log(arr)
+      const { data, error } = await supabase
+              .from('servers')
+              .update({ active_players: arr })
+              .eq('id', serverNum)
+    }
+
     return <>
       <nav className="flex flex-row flex-nowrap h-[7vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
@@ -309,7 +327,7 @@ export default async function page() {
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
           <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
-            <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} />
+            <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} serverNum={serverNum} playerNum={playerNum}/>
           </div>
         </div>
       </div>
