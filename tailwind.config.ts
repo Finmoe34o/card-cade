@@ -73,12 +73,29 @@ const config = {
         "loading-bar": {
           from: {width: "0"},
           to: {width: "120px"}
+        },
+        comeDown: {
+          "0%":  {
+            opacity: "0",
+            "z-index": "-100",
+          },
+          "1%": { 
+            opacity: "1",
+          },
+          "90%" : {
+            "z-index": "-100",
+          },
+          "100%": {
+            opacity : "1",
+            "z-index": "40",
+          }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "loading-bar": "loading-bar 10s linear"
+        "loading-bar": "loading-bar 10s linear",
+        "comeDown": "comeDown 2s linear"
       },
     },
   },
