@@ -74,7 +74,7 @@ const config = {
           from: {width: "0"},
           to: {width: "120px"}
         },
-        comeDown: {
+        comeUp: {
           "0%" : {
             height: "0",
             top: "0",
@@ -83,13 +83,23 @@ const config = {
             height: "30vh",
             top: "-30vh"
           }
+        }, comeDown: {
+          "0%" : {
+            height: "30vh",
+            top: "-30vh",
+          },
+          "100%" : {
+            height: "0",
+            top: "0"
+          }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "loading-bar": "loading-bar 10s linear",
-        "comeDown": "comeDown 0.8s ease-out"
+        "comeDown": "comeDown 0.4s ease-out",
+        "comeUp": "comeUp 0.6s ease-in"
       },
     },
   },

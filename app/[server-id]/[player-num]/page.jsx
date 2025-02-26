@@ -2,6 +2,7 @@ import Link from "next/link"
 import { createClient } from '@/utils/supabase/server';
 import { headers } from "next/headers";
 import ActionButtons from "../../../components/actionButtons"
+import { sendValuesToServer } from "../../actions";
 
 export default async function page() {
     const headerList = await headers()
@@ -292,8 +293,10 @@ export default async function page() {
       return cardFunct(suit, card); 
     }
 
-    let turn = 2
-
+    let turn = 1
+    let minBet = 2
+    let stackSize = 2
+    let potSize = 2
     return <>
       <nav className="flex flex-row flex-nowrap h-[7vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
@@ -306,7 +309,7 @@ export default async function page() {
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
           <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
-            <ActionButtons />
+            <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} />
           </div>
         </div>
       </div>
