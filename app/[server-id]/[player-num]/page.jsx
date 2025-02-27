@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { headers } from "next/headers";
 import ActionButtons from "../../../components/actionButtons"
 
+
 export default async function page() {
     const headerList = await headers()
     const pathname = await headerList.get("x-current-path");
@@ -14,12 +15,18 @@ export default async function page() {
         .select("*")
     const hand = []
     const river = []
-    const activePlayers = servers[serverNum - 1].activePlayers
+    const activePlayers = servers[serverNum - 1].active_players
     const turn = servers[serverNum - 1].turn
     let minBet = 2
     let stackSize = 100
     let potSize = 2
-    let round = 0
+    const round = servers[serverNum - 1].round
+    if (round === null) {
+      const { data, error } = await supabase
+                .from('servers')
+                .update({ "round": 1 })
+                .eq('id', serverNum)
+    }
     const cardFunct = (suit, num) => {
       const spade = () => {
         return <>
@@ -296,30 +303,46 @@ export default async function page() {
       }
       return cardFunct(suit, card); 
     }
-    if (turn === null || turn === undefined || turn === 7) {
-      const { data, error } = await supabase
-              .from('servers')
-              .update({ "turn": 1 })
-              .eq('id', serverNum)
-    }
-    if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
-      generateCards(serverNum, playerNum)
-    } 
-    if (turn === 1) {
-      round === 5 ? round = 1 : round++
-    }  
-    if (activePlayers === undefined && round === 1) {
-      const arr = []
-      for (let i = 1; i < servers[serverNum - 1].players + 1; i++) {
-        arr.push(i)
-      }
-      console.log(arr)
-      const { data, error } = await supabase
-              .from('servers')
-              .update({ "active_players": arr })
-              .eq('id', serverNum)
-    }
+ 
+    
 
+      if (turn === null || turn === undefined || turn === 7) {
+        const { data, error } = await supabase
+                .from('servers')
+                .update({ "turn": 1 })
+                .eq('id', serverNum)
+      }
+      if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
+        generateCards(serverNum, playerNum)
+      }
+      if (turn === 1) {
+        if (round === 5) {
+        const { data, error } = await supabase
+                .from('servers')
+                .update({ "round": 1 })
+                .eq('id', serverNum)
+        } else {
+          console.log("SDJANSD")
+          let tempRound = round
+          tempRound++
+          const { data, error } = await supabase
+                .from('servers')
+                .update({ "round": tempRound })
+                .eq('id', serverNum)
+        }
+      }
+      if (servers[serverNum - 1].active_players === undefined && round === 1) {
+        const arr = []
+        for (let i = 1; i < servers[serverNum - 1].players + 1; i++) {
+          arr.push(i)
+        }
+        console.log(arr)
+        const { data, error } = await supabase
+                .from('servers')
+                .update({ "active_players": arr })
+                .eq('id', serverNum)
+      }
+      
     return <>
       <nav className="flex flex-row flex-nowrap h-[7vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
@@ -332,7 +355,7 @@ export default async function page() {
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
           <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
-            <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} serverNum={serverNum} playerNum={playerNum}/>
+            <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} serverNum={serverNum} playerNum={playerNum} round={round}/>
           </div>
         </div>
       </div>
@@ -354,7 +377,8 @@ export default async function page() {
         </div>
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">
-        <div className="mx-auto flex">
+        <div className="text-white mx-auto flex">
+          {round}{turn}{minBet}
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",1)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",2)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",3)}</div>
@@ -365,4 +389,37 @@ export default async function page() {
     </>
   }
 
-  /**/
+  export async function updateFunct (round){
+    
+    const supabase = await createClient()
+    const { data: servers} = await supabase
+        .from("servers")
+        .select("*")
+    const headerList = await headers()
+    const pathname = await headerList.get("x-current-path");
+    const serverNum = pathname[1]
+    const turn = servers[serverNum - 1].turn
+    if (turn === null || turn === undefined || turn === 7) {
+      const { data, error } = await supabase
+              .from('servers')
+              .update({ "turn": 1 })
+              .eq('id', serverNum)
+    }
+    if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
+      generateCards(serverNum, playerNum)
+    } 
+    if (turn === 1) {
+      round === 5 ? round = 1 : round++
+    }  
+    if (servers[serverNum - 1].active_players === undefined && round === 1) {
+      const arr = []
+      for (let i = 1; i < servers[serverNum - 1].players + 1; i++) {
+        arr.push(i)
+      }
+      console.log(arr)
+      const { data, error } = await supabase
+              .from('servers')
+              .update({ "active_players": arr })
+              .eq('id', serverNum)
+    }
+    }
