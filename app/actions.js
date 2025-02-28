@@ -34,8 +34,4 @@ export async function sendValuesToServer(bet, serverNum, playerNum, round) {
         .update({ "turn": turn })
         .eq("id", serverNum)
     console.log("ASDHBSAJ")
-    updateFunct(round)
-    revalidatePath(`/${serverNum}/${playerNum}`)
-    revalidateTag('server-data')
-    page()
 }

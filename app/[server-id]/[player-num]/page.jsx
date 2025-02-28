@@ -378,7 +378,6 @@ export default async function page() {
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">
         <div className="text-white mx-auto flex">
-          {round}{turn}{minBet}
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",1)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",2)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",3)}</div>
