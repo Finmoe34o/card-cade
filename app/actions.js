@@ -1,10 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server"
-import { updateFunct } from "./[server-id]/[player-num]/page";
-import { revalidatePath } from "next/cache";
-import { revalidateTag } from "next/cache";
-import page from "../app/[server-id]/[player-num]/page"
+
 
 export async function sendValuesToServer(bet, serverNum, playerNum, round) {
     const supabase = await createClient()
@@ -28,10 +25,19 @@ export async function sendValuesToServer(bet, serverNum, playerNum, round) {
             .eq("id", serverNum)
     }
     let turn = servers[serverNum - 1].turn
-    turn++
-    const { data, error } = await supabase
-        .from("servers")
-        .update({ "turn": turn })
-        .eq("id", serverNum)
-    console.log("ASDHBSAJ")
+    if (turn !== 6) {
+        turn++
+        const { data, error } = await supabase
+            .from("servers")
+            .update({ "turn": turn })
+            .eq("id", serverNum)
+    }
+    else {
+        turn = 1
+        round++
+        const { data, errror } = await supabase
+            .from("servers")
+            .update({ "round": round, "turn": turn })
+            .eq("id", serverNum)
+    }
 }

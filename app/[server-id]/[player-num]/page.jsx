@@ -27,55 +27,7 @@ export default async function page() {
                 .update({ "round": 1 })
                 .eq('id', serverNum)
     }
-    const cardFunct = (suit, num) => {
-      const spade = () => {
-        return <>
-          <div className="circle one"></div>
-          <div className="circle two"></div>
-          <div className="diag spade-left"></div>
-          <div className="diag spade-right"></div>
-          <div className="spade-block"></div>
-          <div className="spade-stem"></div>
-        </>
-      }
-  
-      const hearts = () => {
-        return <>
-          <div className="heart-circle heart-one"></div>
-          <div className="heart-circle heart-two"></div>
-          <div className="heartDiag heartLeft"></div>
-          <div className={`heartDiag heartRight`}></div>
-          <div className="heart-block"></div>
-        </>
-      }
-  
-      const diamonds = () => {
-        return <>
-          <div className="rhombus"></div>
-          <div className="out-take diamond-one"></div>
-          <div className="out-take diamond-two"></div>
-          <div className="out-take diamond-three"></div>
-          <div className="out-take diamond-four"></div>
-        </>
-      }
-  
-      const clubs = () => {
-        return <>
-          <div className="club-circle club-one"></div>
-          <div className="club-circle club-two"></div>
-          <div className="club-circle club-three"></div>
-          <div className="club-circle club-four"></div>
-          <div className="clubStem"></div>
-        </>
-      }
-  
-      return <div className={`bg-gray-600 flex flex-col w-[80px] h-[120px] rounded-md border-[1px] border-white`}>
-        <div className="relative left-1 text-sm  font-bold top-1">{num}</div>
-        <div className={`absolute w-[80px] top-[20px] h-[80px]`}>
-          {suit === "spades" ? <div className="absolute left-[17.5px] w-[100%] h-[100%] top-[30px]">{spade()}</div> : suit === "hearts" ? <div className="left-[17px] top-[21px] w-[100%] h-[100%] absolute">{hearts()}</div> : suit === "diamonds" ? <div className="absolute left-[10px] top-[15.5px] w-[100%] h-[100%]">{diamonds()}</div> : <div className="absolute left-[-1px] top-[15px] w-[100%] h-[100%]">{clubs()}</div>}
-        </div>
-      </div>
-    }
+    
   
     const cardGen = (type) => {
       const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
@@ -289,20 +241,7 @@ export default async function page() {
       }
       return highest !== undefined ? [handType, highest] : [handType]
     }
-  
-    const cardFetch = async (type, num) => {
-      let suit
-      let card
-      if (type === "river") {
-        suit = servers[serverNum - 1].river[(num - 1) * 2]
-        card = servers[serverNum - 1].river[(num * 2) - 1]
-      } else {
-        const cardNum  = (playerNum - 1) * 5 + ((num - 1) * 2)
-        suit = servers[serverNum - 1].player_cards[cardNum]
-        card = servers[serverNum - 1].player_cards[cardNum + 1]
-      }
-      return cardFunct(suit, card); 
-    }
+
  
     
 
@@ -343,48 +282,16 @@ export default async function page() {
                 .eq('id', serverNum)
       }
       
+    const riverDB = servers[serverNum - 1].river
+    const handDB = servers[serverNum - 1].player_cards
+    const numOfPlayers = Number(servers[serverNum - 1].players)
     return <>
       <nav className="flex flex-row flex-nowrap h-[7vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
                 <h1 className="text-3xl inline mx-auto top-[1vh] font-extrabold relative">Card Cade {}</h1>    
             </Link>
       </nav>
-      <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
-        <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
-          <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
-          <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
-          <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
-          <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
-            <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} serverNum={serverNum} playerNum={playerNum} round={round}/>
-          </div>
-        </div>
-      </div>
-      <div className="w-[100vw] h-[100vh]">
-        <div className=" absolute left-[15vw] top-[65vh]">
-          <div className={`${servers[serverNum - 1].players >= 2 ? "block" : "block"} ${Number(playerNum) < 6 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-        </div>
-        <div className="absolute left-[15vw] top-[9vh]">
-          <div className={`${servers[serverNum - 1].players >= 3 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-        </div>
-        <div className="relative top-[2vh]">
-          <div className={`mx-auto ${servers[serverNum - 1].players >= 4 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-        </div>
-        <div className="absolute right-[15vw] top-[9vh]">
-          <div className={`${servers[serverNum - 1].players >= 5 ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-        </div>
-        <div className="absolute right-[15vw] top-[65vh]">
-          <div className={`${servers[serverNum - 1].players >= 6 ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-        </div>
-      </div>
-      <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">
-        <div className="text-white mx-auto flex">
-          <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",1)}</div>
-          <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",2)}</div>
-          <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",3)}</div>
-          <div className={`mx-1 ${round >= 3 ? "block" : "hidden"}`}>{cardFetch("river",4)}</div>
-          <div className={`mx-1 ${round >= 4 ? "block" : "hidden"}`}>{cardFetch("river",5)}</div>
-        </div>
-      </div>
+      <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} serverNum={serverNum} playerNum={playerNum} round={round} river={riverDB} player_cards={handDB} numOfPlayers={numOfPlayers}/>
     </>
   }
 
