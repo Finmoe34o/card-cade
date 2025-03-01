@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/server"
 
 
-export async function sendValuesToServer(bet, serverNum, playerNum, round) {
+export async function sendValuesToServer(bet, serverNum, playerNum) {
     const supabase = await createClient()
     const { data: servers } = await supabase
         .from("servers")
@@ -18,6 +18,7 @@ export async function sendValuesToServer(bet, serverNum, playerNum, round) {
             .from('servers')
             .update({ "active_players": newArr })
             .eq("id", serverNum)
+
     } else if (bet > servers[serverNum - 1].min_bet) {
         const { data, error } = await supabase
             .from("servers")
@@ -25,6 +26,7 @@ export async function sendValuesToServer(bet, serverNum, playerNum, round) {
             .eq("id", serverNum)
     }
     let turn = servers[serverNum - 1].turn
+    let round = servers[serverNum - 1].round
     if (turn !== 6) {
         turn++
         const { data, error } = await supabase
