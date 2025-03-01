@@ -277,37 +277,3 @@ export default async function page() {
       <ActionButtons minBet = {minBet} turn = {turn} potSize = {potSize} stackSize = {stackSize} serverNum={serverNum} playerNum={playerNum} round={round} river={riverDB} player_cards={handDB} numOfPlayers={numOfPlayers}/>
     </>
   }
-
-  /*export async function updateFunct (round){
-    
-    const supabase = await createClient()
-    const { data: servers} = await supabase
-        .from("servers")
-        .select("*")
-    const headerList = await headers()
-    const pathname = await headerList.get("x-current-path");
-    const serverNum = pathname[1]
-    const turn = servers[serverNum - 1].turn
-    if (turn === null || turn === undefined || turn === 7) {
-      const { data, error } = await supabase
-              .from('servers')
-              .update({ "turn": 1 })
-              .eq('id', serverNum)
-    }
-    if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
-      generateCards(serverNum, playerNum)
-    } 
-    if (turn === 1) {
-      round === 5 ? round = 1 : round++
-    }  
-    if (servers[serverNum - 1].active_players === undefined && round === 1) {
-      const arr = []
-      for (let i = 1; i < servers[serverNum - 1].players + 1; i++) {
-        arr.push(i)
-      }
-      const { data, error } = await supabase
-              .from('servers')
-              .update({ "active_players": arr })
-              .eq('id', serverNum)
-    }
-    }*/
