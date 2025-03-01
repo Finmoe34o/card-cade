@@ -8,6 +8,13 @@ export async function sendValuesToServer(bet, serverNum, playerNum) {
     const { data: servers } = await supabase
         .from("servers")
         .select("*")
+    const stackSizes = { ...servers[serverNum - 1].stack_sizes };
+
+    stackSizes[playerNum] = Number(stackSizes[playerNum]) - Number(bet);
+    const { data, error } = await supabase
+        .from("servers")
+        .update({ "stack_sizes": stackSizes })
+        .eq('id', serverNum);
     if (bet === 0) {
         const arr = servers[serverNum - 1].active_players
         const newArr = []

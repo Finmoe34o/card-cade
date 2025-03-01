@@ -9,25 +9,23 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
     const [menuOpen, setMenuOpen] = useState(false)
     const [load, setLoad] = useState(false)
     const pNum = Number(playerNum)
-    const [tempStackSize, setTempStackSize] = useState(100000)
 
     
     
     const foldFunct = async() => {
-        await sendValuesToServer(0,serverNum,playerNum,round)
+        await sendValuesToServer(0,serverNum,playerNum)
         window.location.reload()
     }
 
     const checkCallFunct = async () => {
-        await sendValuesToServer(minBet,serverNum,playerNum,round);
+        await sendValuesToServer(minBet,serverNum,playerNum);
         window.location.reload()
     }
 
     const raiseFunct = async () => {
         setBet(betSize);
+        await sendValuesToServer(betSize,serverNum,playerNum)
         setBetSize(-1)
-        setTempStackSize(tempStackSize - bet)
-        await sendValuesToServer(bet,serverNum,playerNum,round)
         window.location.reload()
     }
 
@@ -100,11 +98,11 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
 
 
     const dragFunct = (e) => {
-        mouseDown && e.clientY - 385 > 28 ? (setMouseY(e.clientY - 385), setBetSize((Math.floor((216 - mouseY) / 1.88) / 100) * tempStackSize)) : mouseDown && e.clientY - 385 <= 28 ? (setMouseY(28), setBetSize(tempStackSize)) : ""
+        mouseDown && e.clientY - 385 > 28 ? (setMouseY(e.clientY - 385), setBetSize((Math.floor((216 - mouseY) / 1.88) / 100) * stackSize)) : mouseDown && e.clientY - 385 <= 28 ? (setMouseY(28), setBetSize(stackSize)) : ""
     }
     return <>
          <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
-          <div className="text-white absolute">{tempStackSize}</div>
+          <div className="text-white absolute">{stackSize}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
@@ -125,7 +123,14 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
             <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
             <div style={mouseY !== 0 ? mouseY > 0 ? {top: mouseY } : {top: "0"} : {bottom: 0, opacity: 0}} className="absolute bottom-0 w-[100%] mx-auto h-[3px] rounded-3xl bg-red-500"></div>
           </button>
-        </div>
+        </div> 
+
+
+
+
+/** chang eht erasise meacha sisnam is tajs broene chang eaifioa so tha thant eh h e hg aome ais sa  ubetter  */
+
+
         </div>
           </div>
         </div>

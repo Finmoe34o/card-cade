@@ -17,8 +17,7 @@ export default async function page() {
     const river = []
     const activePlayers = servers[serverNum - 1].active_players
     const turn = servers[serverNum - 1].turn
-    let minBet = 2
-    let stackSize = 100
+    const minBet = servers[serverNum - 1].min_bet
     let potSize = 2
     const round = servers[serverNum - 1].round
     if (round === null) {
@@ -61,7 +60,7 @@ export default async function page() {
         {cardFunct(suit, card)}
       </>
     }
-    
+
 
     const generateCards = async (serverNum, playerNum) => {
       for (let i = 0; i < hand.length; i++) {
@@ -244,8 +243,6 @@ export default async function page() {
     }
 
  
-    
-
       if (turn === null || turn === undefined || turn === 7) {
         const { data, error } = await supabase
                 .from('servers')
@@ -255,28 +252,11 @@ export default async function page() {
       if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {
         generateCards(serverNum, playerNum)
       }
-      if (turn === 1) {
-        if (round === 5) {
-        const { data, error } = await supabase
-                .from('servers')
-                .update({ "round": 1 })
-                .eq('id', serverNum)
-        } else {
-          console.log("SDJANSD")
-          let tempRound = round
-          tempRound++
-          const { data, error } = await supabase
-                .from('servers')
-                .update({ "round": tempRound })
-                .eq('id', serverNum)
-        }
-      }
       if (servers[serverNum - 1].active_players === undefined && round === 1) {
         const arr = []
         for (let i = 1; i < servers[serverNum - 1].players + 1; i++) {
           arr.push(i)
         }
-        console.log(arr)
         const { data, error } = await supabase
                 .from('servers')
                 .update({ "active_players": arr })
@@ -286,6 +266,8 @@ export default async function page() {
     const riverDB = servers[serverNum - 1].river
     const handDB = servers[serverNum - 1].player_cards
     const numOfPlayers = Number(servers[serverNum - 1].players)
+    const stackSize = servers[serverNum - 1].stack_sizes[playerNum]
+
     return <>
       <nav className="flex flex-row flex-nowrap h-[7vh] justify-evenly text-white w-[100vw] border-b-2 border-gray-600">
             <Link className="inline" href="/">
@@ -296,7 +278,7 @@ export default async function page() {
     </>
   }
 
-  export async function updateFunct (round){
+  /*export async function updateFunct (round){
     
     const supabase = await createClient()
     const { data: servers} = await supabase
@@ -323,10 +305,9 @@ export default async function page() {
       for (let i = 1; i < servers[serverNum - 1].players + 1; i++) {
         arr.push(i)
       }
-      console.log(arr)
       const { data, error } = await supabase
               .from('servers')
               .update({ "active_players": arr })
               .eq('id', serverNum)
     }
-    }
+    }*/
