@@ -9,6 +9,21 @@ export async function sendValuesToServer(bet, serverNum, playerNum) {
         .from("servers")
         .select("*")
 
+    const roundRestart = async (round) => {
+        round = 1
+        const river = []
+        const hand = []
+        const activePlayers = []
+        const { data, errror } = await supabase
+            .from("servers")
+            .update({
+                river: [],
+                player_cards: [],
+                active_players: []
+            })
+            .eq("id", serverNum)
+    }
+
     const stackSizes = { ...servers[serverNum - 1].stack_sizes };
     console.log(servers[serverNum - 1].active_players.includes("6"))
     stackSizes[playerNum] = Number(stackSizes[playerNum]) - Number(bet);
@@ -44,8 +59,8 @@ export async function sendValuesToServer(bet, serverNum, playerNum) {
     }
     else {
         turn = 1
-        round++
-        const { data, errror } = await supabase
+        round < 5 ? round++ : (roundRestart(), round = 1)
+        const { data, error } = await supabase
             .from("servers")
             .update({ "round": round, "turn": turn })
             .eq("id", serverNum)

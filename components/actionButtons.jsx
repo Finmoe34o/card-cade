@@ -2,6 +2,8 @@
 
 import {useState} from "react"
 import { sendValuesToServer } from "../app/actions";
+import {activePlayerHandling } from "../app/activePlayerHandling"
+import { useRouter } from 'next/navigation';
 
 export default function page({minBet, turn, pot, stackSize, serverNum, playerNum,round, river, player_cards, numOfPlayers}) {
     const [bet, setBet] = useState(0)
@@ -9,24 +11,35 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
     const [menuOpen, setMenuOpen] = useState(false)
     const [load, setLoad] = useState(false)
     const pNum = Number(playerNum)
+    const [reload, setReload] = useState()
+    const router = useRouter();
 
-    
+    if (round === 1 && !reload) {
+      setReload(true)
+      setTimeout(() => {router.refresh()}, 1000)
+      turn === 1 ? setTimeout(() => {router.refresh()}, 2000) : null
+    }
+
+    if (round >= 2 && reload) {
+      setReload(false)
+    }
+
     
     const foldFunct = async() => {
         await sendValuesToServer(0,serverNum,playerNum)
-        window.location.reload()
+        router.refresh()
     }
 
     const checkCallFunct = async () => {
         await sendValuesToServer(minBet,serverNum,playerNum);
-        window.location.reload()
+        router.refresh()
     }
 
     const raiseFunct = async () => {
         setBet(betSize);
         await sendValuesToServer(betSize,serverNum,playerNum)
-        setBetSize(-1)
-        window.location.reload()
+        setBetSize(-1)  
+        router.refresh()
     }
 
     const [mouseY, setMouseY] = useState(0)
