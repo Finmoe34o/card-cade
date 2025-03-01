@@ -9,6 +9,7 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
     const [menuOpen, setMenuOpen] = useState(false)
     const [load, setLoad] = useState(false)
     const pNum = Number(playerNum)
+    const [tempStackSize, setTempStackSize] = useState(100000)
 
     
     
@@ -25,6 +26,7 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
     const raiseFunct = async () => {
         setBet(betSize);
         setBetSize(-1)
+        setTempStackSize(tempStackSize - bet)
         await sendValuesToServer(bet,serverNum,playerNum,round)
         window.location.reload()
     }
@@ -98,10 +100,11 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
 
 
     const dragFunct = (e) => {
-        mouseDown && e.clientY - 385 > 28 ? (setMouseY(e.clientY - 385), setBetSize((Math.floor((216 - mouseY) / 1.88) / 100)) * stackSize) : mouseDown && e.clientY - 385 <= 28 ? (setMouseY(28), setBetSize(stackSize)) : ""
+        mouseDown && e.clientY - 385 > 28 ? (setMouseY(e.clientY - 385), setBetSize((Math.floor((216 - mouseY) / 1.88) / 100) * tempStackSize)) : mouseDown && e.clientY - 385 <= 28 ? (setMouseY(28), setBetSize(tempStackSize)) : ""
     }
     return <>
          <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
+          <div className="text-white absolute">{tempStackSize}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
@@ -112,6 +115,7 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
         <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{bet === minBet ? "check" : "call"}</button>
         <button onClick={() => {betSize !== 0 ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Raise</button>
         <div className={`bg-gray-600 absolute left-[37.5vw] w-[10vw] rounded-t-2xl ${menuOpen ? "h-[30vh] -top-[30vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
+          <div className="text-white">{betSize}</div>
           <button id="dragButton" onMouseDown={() => {setMouseDown(true)}} onMouseUp={() => {setMouseDown(false)}}  onMouseMove={dragFunct} className={`h-[100%] absolute left-[50%] flex flex-col justify-evenly w-[50%] ${menuOpen ? "block" : "hidden"}`}>
             <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
             <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>

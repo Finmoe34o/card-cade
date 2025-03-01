@@ -61,6 +61,7 @@ export default async function page() {
         {cardFunct(suit, card)}
       </>
     }
+    
 
     const generateCards = async (serverNum, playerNum) => {
       for (let i = 0; i < hand.length; i++) {
