@@ -6,8 +6,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     const supabase = await createClient()
     const serverNum = serverObject.id
     const playerArr = serverObject.active_players
-    let turn = serverObject.turn
-    let round = serverObject.round
+    let turn = Number(serverObject.turn)
+    let round = Number(serverObject.round)
     //get all vars
 
     const cardCheck = (river, hand) => {
@@ -159,7 +159,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         }
         return highest !== undefined ? [handType, highest] : [handType]
     }
-
     if (round === 5) {
         const river = serverObject.river
         const mutiplier = (Number(playerNum) - 1) * 5
@@ -168,25 +167,60 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         hand.push(player_cards[mutiplier], player_cards[mutiplier + 1], player_cards[mutiplier + 2], player_cards[mutiplier + 3])
         const best = [cardCheck(river, hand), playerNum]
         const bestDb = serverObject.best_hand
-        if (!isNaN(best[1])) {
+        /*if (!isNaN(best[0][1])) {
             const arrValues = ["J", "Q", "K", "A"]
-            best[1] !== undefined || best[1] !== playerNum ? best[1] = 10 + arrValues.indexOf(best[1]) : null
+            best[0][1] !== undefined && best[0][1] !== playerNum ? best[0][1] = 10 + arrValues.indexOf(best[0][1]) : null
         }
-        if (bestDb !== null && bestDb[0] !== "royal") {
+        if (bestDb !== null && bestDb[0][0] !== "royal") {
             if (bestDb[0] === "strflu") {
-
+                if (best[0] === "royal" || (best[0] === "strflu" && best[1] > bestDb[1])) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
             } else if (bestDb[0] === "quads") {
-
+                if ((best[0] === "strflu" || best[0] === "royal") || (best[0] === "quads" && best[1] > bestDb[1])) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
             } else if (bestDb[0] === "full") {
-
+                if ((best[0] === "quads" || best[0] === "strflu" || best[0] === "royal") || (best[0] === "full" && best[1] > bestDb[1])) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
             } else if (bestDb[0] === "flush") {
-
+                if ((best[0] === "quads" || best[0] === "full" || best[0] === "strflu" || best[0] === "royal") || (best[0] === "flush" && best[1] > bestDb[1])) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
             } else if (bestDb[0] === "straight") {
-
+                if ((best[0] !== "high" && best[0] !== "pair" && best[0] !== "trips" && best[0] !== "straight") || (best[0] === "straight" && best[1] > bestDb[1])) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
             } else if (bestDb[0] === "trips") {
-
+                if ((best[0] !== "high" && best[0] !== "pair" && best[0] !== "trips") || (best[0] === "trips" && best[1] > bestDb[1])) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
             } else if (bestDb[0] === "pair") {
-
+                if ((best[0] !== "high" && best[0] !== "pair") || (best[0] === "pair" && best[1] > bestDb[1])) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
             } else if (bestDb[0] === "high") {
                 if (best[0] !== "high" || best[1] > bestDb[1]) {
                     const { data, error } = await supabase
@@ -195,13 +229,87 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                         .eq("id", serverNum)
                 }
             }
-        } else if (bestDb === null) {
+        } else if (bestDb[0] !== "royal") {
             const { data, error } = await supabase
                 .from("servers")
                 .update({
                     best_hand: best
                 })
                 .eq("id", serverNum)
+        } else {
+            console.log(bestDb)
+        }*/
+
+        if (!isNaN(best[0][1])) {
+            const arrValues = ["J", "Q", "K", "A"];
+            best[0][1] !== undefined && best[0][1] !== playerNum ? best[0][1] = 10 + arrValues.indexOf(best[0][1]) : null;
+        }
+        if (bestDb === null) {
+            const { data, error } = await supabase
+                .from("servers")
+                .update({ best_hand: best })
+                .eq("id", serverNum);
+        }
+        else {
+            if (bestDb[0][0] !== "royal") {
+                if (bestDb[0][0] === "strflu") {
+                    if (best[0][0] === "royal" || (best[0][0] === "strflu" && best[0][1] > bestDb[0][1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb[0][0] === "quads") {
+                    if ((best[0][0] === "strflu" || best[0][0] === "royal") || (best[0][0] === "quads" && best[0][1] > bestDb[0][1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb[0][0] === "full") {
+                    if ((best[0][0] === "quads" || best[0][0] === "strflu" || best[0][0] === "royal") || (best[0][0] === "full" && best[0][1] > bestDb[0][1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb[0][0] === "flush") {
+                    if ((best[0][0] === "quads" || best[0][0] === "full" || best[0][0] === "strflu" || best[0][0] === "royal") || (best[0][0] === "flush" && best[0][1] > bestDb[0][1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb[0][0] === "straight") {
+                    if ((best[0][0] !== "high" && best[0][0] !== "pair" && best[0][0] !== "trips" && best[0][0] !== "straight") || (best[0][0] === "straight" && best[0][1] > bestDb[0][1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb[0][0] === "trips") {
+                    if ((best[0][0] !== "high" && best[0][0] !== "pair" && best[0][0] !== "trips") || (best[0][0] === "trips" && best[0][1] > bestDb[0][1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb[0][0] === "pair") {
+                    if ((best[0][0] !== "high" && best[0][0] !== "pair") || (best[0][0] === "pair" && best[0][1] > bestDb[0][1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb[0][0] === "high") {
+                    if (best[0][0] !== "high" || best[0][1] > bestDb[0][1]) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                }
+            }
         }
 
     }

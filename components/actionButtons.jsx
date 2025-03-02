@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react"
+import {useState, useEffect} from "react"
 import { sendValuesToServer } from "../app/actions";
 import { useRouter } from 'next/navigation';
 
@@ -10,7 +10,6 @@ export default function page({serverObject, playerNum}) {
     const [menuOpen, setMenuOpen] = useState(false)
     const [load, setLoad] = useState(false)
     const pNum = Number(playerNum)
-    const [reload, setReload] = useState()
     const router = useRouter();
     
     //declaring db Vars
@@ -22,13 +21,18 @@ export default function page({serverObject, playerNum}) {
     const numOfPlayers = serverObject.players
     const river = serverObject.river
 
-    if (round === 1 && !reload) {
-      setReload(true)
-      router.refresh()
-    }
+    const [hasReloaded, setHasReloaded] = useState(false);
 
-    if (round >= 2 && reload) {
-      setReload(false)
+  useEffect(() => {
+    // If round is 1 and hasn't reloaded yet, trigger refresh
+    if (round === 1 && !hasReloaded) {
+      setHasReloaded(true); // Mark as reloaded
+      router.refresh();     // Refresh page
+    }
+  }, [round, hasReloaded, router]);
+
+    if (round >= 2 && hasReloaded) {
+      sethadReloaded(false)
     }
 
     
