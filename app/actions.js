@@ -167,12 +167,43 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         const player_cards = serverObject.player_cards
         hand.push(player_cards[mutiplier], player_cards[mutiplier + 1], player_cards[mutiplier + 2], player_cards[mutiplier + 3])
         const best = [cardCheck(river, hand), playerNum]
-        const { data, error } = await supabase
-            .from("servers")
-            .update({
-                best_hand: best
-            })
-            .eq("id", serverNum)
+        const bestDb = serverObject.best_hand
+        if (!isNaN(best[1])) {
+            const arrValues = ["J", "Q", "K", "A"]
+            best[1] !== undefined || best[1] !== playerNum ? best[1] = 10 + arrValues.indexOf(best[1]) : null
+        }
+        if (bestDb !== null && bestDb[0] !== "royal") {
+            if (bestDb[0] === "strflu") {
+
+            } else if (bestDb[0] === "quads") {
+
+            } else if (bestDb[0] === "full") {
+
+            } else if (bestDb[0] === "flush") {
+
+            } else if (bestDb[0] === "straight") {
+
+            } else if (bestDb[0] === "trips") {
+
+            } else if (bestDb[0] === "pair") {
+
+            } else if (bestDb[0] === "high") {
+                if (best[0] !== "high" || best[1] > bestDb[1]) {
+                    const { data, error } = await supabase
+                        .from("servers")
+                        .update({ best_hand: best })
+                        .eq("id", serverNum)
+                }
+            }
+        } else if (bestDb === null) {
+            const { data, error } = await supabase
+                .from("servers")
+                .update({
+                    best_hand: best
+                })
+                .eq("id", serverNum)
+        }
+
     }
 
     const roundRestart = async (round) => {
@@ -185,7 +216,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({
                 river: [],
                 player_cards: [],
-                active_players: []
+                active_players: [],
+                best_hand: null
             })
             .eq("id", serverNum)
     }
