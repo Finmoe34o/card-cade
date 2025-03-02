@@ -2,10 +2,9 @@
 
 import {useState} from "react"
 import { sendValuesToServer } from "../app/actions";
-import {activePlayerHandling } from "../app/activePlayerHandling"
 import { useRouter } from 'next/navigation';
 
-export default function page({minBet, turn, pot, stackSize, serverNum, playerNum,round, river, player_cards, numOfPlayers}) {
+export default function page({serverObject, playerNum}) {
     const [bet, setBet] = useState(0)
     const [betSize, setBetSize] = useState(0)
     const [menuOpen, setMenuOpen] = useState(false)
@@ -13,11 +12,19 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
     const pNum = Number(playerNum)
     const [reload, setReload] = useState()
     const router = useRouter();
+    
+    //declaring db Vars
+    let round = serverObject.round
+    let turn = serverObject.turn
+    let stackSize = serverObject.stack_sizes[playerNum]
+    const player_cards = serverObject.player_cards
+    const minBet = serverObject.min_bet
+    const numOfPlayers = serverObject.players
+    const river = serverObject.river
 
     if (round === 1 && !reload) {
       setReload(true)
-      setTimeout(() => {router.refresh()}, 1000)
-      turn === 1 ? setTimeout(() => {router.refresh()}, 2000) : null
+      router.refresh()
     }
 
     if (round >= 2 && reload) {
@@ -26,18 +33,18 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
 
     
     const foldFunct = async() => {
-        await sendValuesToServer(0,serverNum,playerNum)
+        await sendValuesToServer(0,serverObject,playerNum)
         router.refresh()
     }
 
     const checkCallFunct = async () => {
-        await sendValuesToServer(minBet,serverNum,playerNum);
+        await sendValuesToServer(minBet,serverObject,playerNum);
         router.refresh()
     }
 
     const raiseFunct = async () => {
         setBet(betSize);
-        await sendValuesToServer(betSize,serverNum,playerNum)
+        await sendValuesToServer(betSize,serverObject,playerNum)
         setBetSize(-1)  
         router.refresh()
     }
@@ -115,14 +122,14 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
     }
     return <>
          <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
-          <div className="text-white absolute">{stackSize}</div>
+          <div className="text-white absolute">{stackSize}{serverObject.best_hand}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
           <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
           <div className="flex absolute justify-between w-[50vw] h-[20vh]">
-        <button onClick={turn === pNum ? foldFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Fold{turn}</button>
+        <button onClick={turn === pNum ? foldFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Fold</button>
         <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{bet === minBet ? "check" : "call"}</button>
         <button onClick={() => {betSize !== 0 ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Raise</button>
         <div className={`bg-gray-600 absolute left-[37.5vw] w-[10vw] rounded-t-2xl ${menuOpen ? "h-[30vh] -top-[30vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
@@ -137,13 +144,6 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
             <div style={mouseY !== 0 ? mouseY > 0 ? {top: mouseY } : {top: "0"} : {bottom: 0, opacity: 0}} className="absolute bottom-0 w-[100%] mx-auto h-[3px] rounded-3xl bg-red-500"></div>
           </button>
         </div> 
-
-
-
-
-/** chang eht erasise meacha sisnam is tajs broene chang eaifioa so tha thant eh h e hg aome ais sa  ubetter  */
-
-
         </div>
           </div>
         </div>
@@ -167,6 +167,7 @@ export default function page({minBet, turn, pot, stackSize, serverNum, playerNum
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">
         <div className="text-white mx-auto flex">
+          <div>MAKE STACKS WORK THEN CARD CHECK DO A BIT OF LOGIC ABOUT JOINING AND SN</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",1)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",2)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",3)}</div>
