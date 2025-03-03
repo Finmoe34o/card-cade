@@ -48,7 +48,7 @@ export default async function page() {
             newServer(servers.length + 1)
             serverNum = servers.length + 1
         }
-        iteratePlayerNum(playerNum,serverNum)
+        //iteratePlayerNum(playerNum,serverNum)
         if (servers[serverNum - 1].players === 1) {
             const { data, error } = await supabase
                 .from('servers')

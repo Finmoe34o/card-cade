@@ -37,6 +37,10 @@ export default function page({serverObject, playerNum}) {
       sethadReloaded(false)
     }
 
+    useEffect(() => {
+      router.refresh()
+    }, [serverObject])
+
     
     const foldFunct = async() => {
         await sendValuesToServer(bet,serverObject,playerNum)
@@ -45,7 +49,7 @@ export default function page({serverObject, playerNum}) {
 
     const checkCallFunct = async () => {
         await sendValuesToServer(minBet,serverObject,playerNum);
-        router.refresh()
+        window.location.reload()
     }
 
     const raiseFunct = async () => {
@@ -128,7 +132,6 @@ export default function page({serverObject, playerNum}) {
     }
     return <>
          <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
-          <div className="text-white absolute">{stackSize}{serverObject.best_hand}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
@@ -136,7 +139,7 @@ export default function page({serverObject, playerNum}) {
           <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
           <div className="flex absolute justify-between w-[50vw] h-[20vh]">
         <button onClick={turn === pNum ? foldFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Fold</button>
-        <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{bet === minBet ? "check" : "call"}</button>
+        <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{Number(bet) === Number(minBet) ? "check" : "call"}</button>
         <button onClick={() => {betSize !== 0 ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Raise</button>
         <div className={`bg-gray-600 absolute left-[37.5vw] w-[10vw] rounded-t-2xl ${menuOpen ? "h-[30vh] -top-[30vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
           <div className="text-white">{betSize}</div>
@@ -157,23 +160,27 @@ export default function page({serverObject, playerNum}) {
       <div className="w-[100vw] h-[100vh]">
         <div className=" absolute left-[15vw] top-[65vh]">
           <div className={`${numOfPlayers >= 2 ? "block" : "block"} ${Number(playerNum) < 6 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="text-white">{serverObject.stack_sizes[pNum < 6 ? pNum + 1: pNum - 5]}</div>
         </div>
         <div className="absolute left-[15vw] top-[9vh]">
           <div className={`${numOfPlayers >= 3 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="text-white">{serverObject.stack_sizes[pNum < 5 ? pNum + 2: pNum - 4]}</div>
         </div>
-        <div className="relative top-[2vh]">
+        <div className="relative mx-auto top-[2vh]">
           <div className={`mx-auto ${numOfPlayers >= 4 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="text-white mx-auto w-[100px] text-center">{serverObject.stack_sizes[pNum < 4 ? pNum + 3: pNum - 3]}</div>
         </div>
         <div className="absolute right-[15vw] top-[9vh]">
           <div className={`${numOfPlayers ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="text-white">{serverObject.stack_sizes[pNum < 3 ? pNum + 4: pNum - 2]}</div>
         </div>
         <div className="absolute right-[15vw] top-[65vh]">
           <div className={`${numOfPlayers ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className="text-white">{serverObject.stack_sizes[pNum < 2 ? pNum + 5: pNum - 1]}</div>
         </div>
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">
         <div className="text-white mx-auto flex">
-          <div>MAKE STACKS WORK THEN CARD CHECK DO A BIT OF LOGIC ABOUT JOINING AND SN</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",1)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",2)}</div>
           <div className={`mx-1 ${round >= 2 ? "block" : "hidden"}`}>{cardFetch("river",3)}</div>

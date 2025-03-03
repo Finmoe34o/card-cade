@@ -291,14 +291,14 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     }
     else {
         let big_Blind = serverObject.big_Blind
-        if (round < 5) {    
+        if (round < 5) {
             round++
             const minBet = serverObject.min_bet
             const pot = (activePlayers.length * minBet)
         } else {
             roundRestart()
             round = 1
-            big_Blind === 6 ? big_Blind = 1: big_Blind++
+            big_Blind === 6 ? big_Blind = 1 : big_Blind++
             const bestDb = serverObject.best_hand
             stackSizes[bestDb[1]] = stackSizes[bestDb[1]] + pot
         }
