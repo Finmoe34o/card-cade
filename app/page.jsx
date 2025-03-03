@@ -19,9 +19,10 @@ export default async function page() {
                     players: 1,
                     river: '{}',
                     player_cards: '{}',
+                    stack_sizes: `{}`
                 },
               ])
-            .select("*")
+            .eq("id", newServer)
         console.error("Error inserting server:", error);
     }
 
@@ -48,7 +49,7 @@ export default async function page() {
             newServer(servers.length + 1)
             serverNum = servers.length + 1
         }
-        //iteratePlayerNum(playerNum,serverNum) !!!!!!!!! this is the code just remove the comment
+        iteratePlayerNum(playerNum,serverNum)
         return `/${serverNum}/${playerNum}`
     }
  

@@ -20,14 +20,16 @@ export default function page({serverObject, playerNum}) {
     const minBet = serverObject.min_bet
     const numOfPlayers = serverObject.players
     const river = serverObject.river
+    const bigBlind = Number(serverObject.big_blind)
+    bigBlind === playerNum ? setBet(50) : bigBlind - 1 === playerNum ? setBet(25) : null
 
     const [hasReloaded, setHasReloaded] = useState(false);
 
   useEffect(() => {
-    // If round is 1 and hasn't reloaded yet, trigger refresh
+    
     if (round === 1 && !hasReloaded) {
-      setHasReloaded(true); // Mark as reloaded
-      router.refresh();     // Refresh page
+      setHasReloaded(true);
+      router.refresh();
     }
   }, [round, hasReloaded, router]);
 
@@ -37,7 +39,7 @@ export default function page({serverObject, playerNum}) {
 
     
     const foldFunct = async() => {
-        await sendValuesToServer(0,serverObject,playerNum)
+        await sendValuesToServer(bet,serverObject,playerNum)
         router.refresh()
     }
 
@@ -47,7 +49,7 @@ export default function page({serverObject, playerNum}) {
     }
 
     const raiseFunct = async () => {
-        setBet(betSize);
+        betSize < bet ? setBetSize(bet) : setBet(betSize)
         await sendValuesToServer(betSize,serverObject,playerNum)
         setBetSize(-1)  
         router.refresh()

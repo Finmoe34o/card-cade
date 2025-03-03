@@ -16,8 +16,15 @@ export default async function page() {
     const hand = []
     const river = []
     const activePlayers = servers[serverNum - 1].active_players
-    const turn = servers[serverNum - 1].turn
+    let turn = servers[serverNum - 1].turn
     const round = servers[serverNum - 1].round
+    const bigBlind = servers[serverNum - 1].big_blind
+    if (bigBlind === null) {
+      const { data, error } = await supabase
+                .from('servers')
+                .update({ "big_Blind": 1 })
+                .eq('id', serverNum)
+    }
     if (round === null && activePlayers >= 2) {
       const { data, error } = await supabase
                 .from('servers')
@@ -136,9 +143,11 @@ export default async function page() {
 
  
       if (turn === null || turn === undefined || turn === 7) {
+        const big_blind = servers[serverNum - 1].big_blind
+        bigBlind === 6 ? turn = 1 : turn = bigBlind + 1
         const { data, error } = await supabase
                 .from('servers')
-                .update({ "turn": 1 })
+                .update({ "turn": turn })
                 .eq('id', serverNum)
       }
       if (servers[serverNum - 1].river === null || servers[serverNum - 1].river.length === 0) {

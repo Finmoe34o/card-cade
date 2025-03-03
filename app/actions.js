@@ -254,7 +254,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 river: [],
                 player_cards: [],
                 active_players: [],
-                best_hand: null
+                best_hand: null,
+                min_bet: 50
             })
             .eq("id", serverNum)
     }
@@ -289,20 +290,21 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .eq("id", serverNum)
     }
     else {
-        turn = 1
-        if (round < 5) {
+        let big_Blind = serverObject.big_Blind
+        if (round < 5) {    
             round++
             const minBet = serverObject.min_bet
             const pot = (activePlayers.length * minBet)
         } else {
             roundRestart()
             round = 1
+            big_Blind === 6 ? big_Blind = 1: big_Blind++
             const bestDb = serverObject.best_hand
             stackSizes[bestDb[1]] = stackSizes[bestDb[1]] + pot
         }
         const { data, error } = await supabase
             .from("servers")
-            .update({ "round": round, "turn": turn })
+            .update({ "round": round, "turn": turn, "big_blind": big_Blind })
             .eq("id", serverNum)
     }
 }
