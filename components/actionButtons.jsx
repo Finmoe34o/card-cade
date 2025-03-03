@@ -23,24 +23,12 @@ export default function page({serverObject, playerNum}) {
     const bigBlind = Number(serverObject.big_blind)
     bigBlind === playerNum ? setBet(50) : bigBlind - 1 === playerNum ? setBet(25) : null
 
-    const [hasReloaded, setHasReloaded] = useState(false);
-
-  useEffect(() => {
-    
-    if (round === 1 && !hasReloaded) {
-      setHasReloaded(true);
-      router.refresh();
-    }
-  }, [round, hasReloaded, router]);
-
-    if (round >= 2 && hasReloaded) {
-      sethadReloaded(false)
-    }
 
     useEffect(() => {
       router.refresh()
     }, [serverObject])
 
+    //turn skipping on rounds after first and handling first turn after big blind 
     
     const foldFunct = async() => {
         await sendValuesToServer(bet,serverObject,playerNum)
@@ -139,7 +127,7 @@ export default function page({serverObject, playerNum}) {
           <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
           <div className="flex absolute justify-between w-[50vw] h-[20vh]">
         <button onClick={turn === pNum ? foldFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Fold</button>
-        <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{Number(bet) === Number(minBet) ? "check" : "call"}</button>
+        <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{Number(bet) === Number(minBet) ? "check" : "call"}{serverObject.best_hand.card}</button>
         <button onClick={() => {betSize !== 0 ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Raise</button>
         <div className={`bg-gray-600 absolute left-[37.5vw] w-[10vw] rounded-t-2xl ${menuOpen ? "h-[30vh] -top-[30vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
           <div className="text-white">{betSize}</div>
