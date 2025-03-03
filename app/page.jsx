@@ -11,7 +11,6 @@ export default async function page() {
         .select("*")
 
     const newServer = async (newServer) => {
-        const supabase = await createClient()
         const { data, error } = await supabase
             .from('servers')
             .insert([
@@ -27,7 +26,7 @@ export default async function page() {
     }
 
     const iteratePlayerNum = async (playerNum,serverNum) => {
-        const supabase = await createClient()
+        
         const { data, error } = await supabase
             .from('servers')
             .update({ "players": playerNum })
@@ -35,7 +34,7 @@ export default async function page() {
 
     }
     
-    const findServer = () => {
+    const findServer = async () => {
         let serverNum
         let playerNum
         for (let i = 0; i < servers.length; i++) {
@@ -50,6 +49,19 @@ export default async function page() {
             serverNum = servers.length + 1
         }
         iteratePlayerNum(playerNum,serverNum)
+        if (servers[serverNum - 1].players === 1) {
+            const { data, error } = await supabase
+                .from('servers')
+                .insert([
+                    {
+                        players: 1,
+                        river: '{}',
+                        player_cards: '{}',
+                        stack_sizes: `{}`
+                    },
+                ])
+                .eq("id", serverNum)
+        }
         return `/${serverNum}/${playerNum}`
     }
  
