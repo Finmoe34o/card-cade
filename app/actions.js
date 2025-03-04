@@ -175,80 +175,97 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             const arrValues = ["J", "Q", "K", "A"];
             best.card[1] !== undefined && best.card[1] !== playerNum ? best.card[1] = 10 + arrValues.indexOf(best.card[1]) : null;
         }
-
-        if (bestDb === null) {
-            const arr = []
-            arr.push(best)
-            const { data, error } = await supabase
-                .from("servers")
-                .update({ best_hand: arr })
-                .eq("id", serverNum);
-        } else {
-            if (bestDb.card[0] !== "royal") {
-                if (bestDb.card[0] === "strflu") {
-                    if (best.card[0] === "royal" || (best.card[0] === "strflu" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "quads") {
-                    if ((best.card[0] === "strflu" || best.card[0] === "royal") || (best.card[0] === "quads" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "full") {
-                    if ((best.card[0] === "quads" || best.card[0] === "strflu" || best.card[0] === "royal") || (best.card[0] === "full" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "flush") {
-                    if ((best.card[0] === "quads" || best.card[0] === "full" || best.card[0] === "strflu" || best.card[0] === "royal") || (best.card[0] === "flush" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "straight") {
-                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips" && best.card[0] !== "straight" && best.card[0] !== "twoPair") || (best.card[0] === "straight" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "trips") {
-                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "twoPair" && best.card[0] !== "trips") || (best.card[0] === "trips" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "twoPair") {
-                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips") || (best.card[0] === "twoPair" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "pair") {
-                    if ((best.card[0] !== "high" && best.card[0] !== "pair") || (best.card[0] === "pair" && best.card[1] > bestDb.card[1])) {
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: best })
-                            .eq("id", serverNum);
-                    }
-                } else if (bestDb.card[0] === "high") {
-                    if (best.card[0] !== "high" || best.card[1] > bestDb.card[1]) {
-                        const arr = []
-                        arr.push(best)
-                        const { data, error } = await supabase
-                            .from("servers")
-                            .update({ best_hand: arr })
-                            .eq("id", serverNum);
+        const comparison = async (i) => {
+            if (bestDb === null) {
+                const arr = [];
+                arr.push(best)
+                const { data, error } = await supabase
+                    .from("servers")
+                    .update({ best_hand: arr })
+                    .eq("id", serverNum);
+            } else {
+                if (bestDb.card[0] !== "royal") {
+                    if (bestDb.card[0] === "strflu") {
+                        if (best.card[0] === "royal" || (best.card[0] === "strflu" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "quads") {
+                        if ((best.card[0] === "strflu" || best.card[0] === "royal") || (best.card[0] === "quads" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "full") {
+                        if ((best.card[0] === "quads" || best.card[0] === "strflu" || best.card[0] === "royal") || (best.card[0] === "full" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "flush") {
+                        if ((best.card[0] === "quads" || best.card[0] === "full" || best.card[0] === "strflu" || best.card[0] === "royal") || (best.card[0] === "flush" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "straight") {
+                        if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips" && best.card[0] !== "straight" && best.card[0] !== "twoPair") || (best.card[0] === "straight" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "trips") {
+                        if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "twoPair" && best.card[0] !== "trips") || (best.card[0] === "trips" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "twoPair") {
+                        if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips") || (best.card[0] === "twoPair" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "pair") {
+                        if ((best.card[0] !== "high" && best.card[0] !== "pair") || (best.card[0] === "pair" && best.card[1] > bestDb.card[1])) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
+                    } else if (bestDb.card[0] === "high") {
+                        if (best.card[0] !== "high" || best.card[1] > bestDb.card[1]) {
+                            const arr = [];
+                            arr.push(best);
+                            const { data, error } = await supabase
+                                .from("servers")
+                                .update({ best_hand: arr })
+                                .eq("id", serverNum);
+                        }
                     }
                 }
             }
