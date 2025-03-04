@@ -212,14 +212,21 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                             .eq("id", serverNum);
                     }
                 } else if (bestDb.card[0] === "straight") {
-                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips" && best.card[0] !== "straight") || (best.card[0] === "straight" && best.card[1] > bestDb.card[1])) {
+                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips" && best.card[0] !== "straight" && best.card[0] !== "twoPair") || (best.card[0] === "straight" && best.card[1] > bestDb.card[1])) {
                         const { data, error } = await supabase
                             .from("servers")
                             .update({ best_hand: best })
                             .eq("id", serverNum);
                     }
                 } else if (bestDb.card[0] === "trips") {
-                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips") || (best.card[0] === "trips" && best.card[1] > bestDb.card[1])) {
+                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "twoPair" && best.card[0] !== "trips") || (best.card[0] === "trips" && best.card[1] > bestDb.card[1])) {
+                        const { data, error } = await supabase
+                            .from("servers")
+                            .update({ best_hand: best })
+                            .eq("id", serverNum);
+                    }
+                } else if (bestDb.card[0] === "twoPair") {
+                    if ((best.card[0] !== "high" && best.card[0] !== "pair" && best.card[0] !== "trips") || (best.card[0] === "twoPair" && best.card[1] > bestDb.card[1])) {
                         const { data, error } = await supabase
                             .from("servers")
                             .update({ best_hand: best })
@@ -240,49 +247,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                             .eq("id", serverNum);
                     }
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-                // add two pair to the card heck tyou fucligna 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             }
         }
 
@@ -304,8 +268,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             })
             .eq("id", serverNum)
     }
-    let big_Blind = Number(serverObject.big_Blind)
-    bet >= minBet ? activePlayers.push(playerNum) : null
+    let big_Blind = Number(serverObject.big_blind)
+    bet >= minBet && round === 1 ? activePlayers.push(playerNum) : null
     let stackSizes = { ...serverObject.stack_sizes };
     const { data, error } = await supabase
         .from("servers")
@@ -329,7 +293,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .eq("id", serverNum)
     }
     if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 7 - big_Blind)) {
-        turn === 6 ? turn = 1 : turn++
+        while (!activePlayers.includes(turn) && activePlayers.length) {
+            turn === 6 ? turn = 1 : turn++
+        }
         const { data, error } = await supabase
             .from("servers")
             .update({ "turn": turn })
@@ -337,8 +303,13 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     }
     else {
 
-        if (round < 5) {
+        if (round === 1) {
+            big_Blind === 6 ? turn = 1 : turn = big_Blind + 1
             round++
+        } else if (round < 5) {
+            big_Blind > 2 ? turn = big_Blind - 2 : turn = 7 - big_Blind
+            round++
+
         } else {
             roundRestart()
             round = 1
@@ -346,8 +317,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             const bestDb = serverObject.best_hand
             stackSizes[Number(bestDb.num)] = stackSizes[Number(bestDb.num)] + pot
             console.log("\n\n\n\n\n\n ", stackSizes, bestDb.num, stackSizes[Number(bestDb.num)], pot)
-            turn = big_Blind + 1
-            big_Blind === 6 ? big_Blind = 1 : big_Blind++
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })

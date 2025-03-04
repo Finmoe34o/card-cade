@@ -89,10 +89,13 @@ export default async function page() {
       let num2 
       let copy = true
       while (copy) {
+        const cardVals = ["J","Q","K","A"]
         copy = false
         num2 = Math.floor(Math.random() * 13)
+        let num2Plus = num2 + 2
+        num2Plus === 1 ? num2Plus = "A" : num2Plus > 10 ? num2Plus = cardVals[num2Plus - 11] : null  
         for (let i = 0; i < 10;i = i + 2) {
-          if (servers[serverNum - 1].river[i] === null || (servers[serverNum - 1].river[i] === suit && servers[serverNum - 1].river[i + 1] === num2)) {
+          if (servers[serverNum - 1].river[i] === null || (servers[serverNum - 1].river[i] === suit && servers[serverNum - 1].river[i + 1] === num2Plus)) {
             copy = true
             break
           }
