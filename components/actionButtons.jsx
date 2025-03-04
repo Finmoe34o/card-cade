@@ -130,7 +130,6 @@ export default function page({serverObject, playerNum}) {
         <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{Number(bet) === Number(minBet) ? "check" : "call"}</button>
         <button onClick={() => {betSize !== 0 ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Raise</button>
         <div className={`bg-gray-600 absolute left-[37.5vw] w-[10vw] rounded-t-2xl ${menuOpen ? "h-[30vh] -top-[30vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
-          <div className="text-white">{betSize}</div>
           <button id="dragButton" onMouseDown={() => {setMouseDown(true)}} onMouseUp={() => {setMouseDown(false)}}  onMouseMove={dragFunct} className={`h-[100%] absolute left-[50%] flex flex-col justify-evenly w-[50%] ${menuOpen ? "block" : "hidden"}`}>
             <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
             <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
@@ -148,23 +147,23 @@ export default function page({serverObject, playerNum}) {
       <div className="w-[100vw] h-[100vh]">
         <div className=" absolute left-[15vw] top-[65vh]">
           <div className={`${numOfPlayers >= 2 ? "block" : "block"} ${Number(playerNum) < 6 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="text-white">{serverObject.stack_sizes[pNum < 6 ? pNum + 1: pNum - 5]}</div>
+          <div className="text-white">{ pNum < 6 ? serverObject.big_blind === pNum + 1 ? "big blind": null: serverObject.big_blind === pNum - 5? "big blind": null }</div>
         </div>
         <div className="absolute left-[15vw] top-[9vh]">
           <div className={`${numOfPlayers >= 3 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="text-white">{serverObject.stack_sizes[pNum < 5 ? pNum + 2: pNum - 4]}</div>
+          <div className="text-white text-center">{ pNum < 5 ? serverObject.big_blind === pNum + 2 ? "big blind": null: serverObject.big_blind === pNum - 4? "big blind": null }</div>
         </div>
         <div className="relative mx-auto top-[2vh]">
           <div className={`mx-auto ${numOfPlayers >= 4 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="text-white mx-auto w-[100px] text-center">{serverObject.stack_sizes[pNum < 4 ? pNum + 3: pNum - 3]}</div>
+          <div className="text-white mx-auto w-[100px] text-center">{ pNum < 4 ? serverObject.big_blind === pNum + 3 ? "big blind": null: serverObject.big_blind === pNum - 3? "big blind": null }</div>
         </div>
         <div className="absolute right-[15vw] top-[9vh]">
           <div className={`${numOfPlayers ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="text-white">{serverObject.stack_sizes[pNum < 3 ? pNum + 4: pNum - 2]}</div>
+          <div className="text-white">{ pNum < 3 ? serverObject.big_blind === pNum + 4 ? "big blind": null: serverObject.big_blind === pNum - 2? "big blind": null }</div>
         </div>
         <div className="absolute right-[15vw] top-[65vh]">
           <div className={`${numOfPlayers ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
-          <div className="text-white">{serverObject.stack_sizes[pNum < 2 ? pNum + 5: pNum - 1]}</div>
+          <div className="text-white">{ pNum < 2 ? serverObject.big_blind === pNum + 5 ? "big blind": null: serverObject.big_blind === pNum - 1? "big blind": null }</div>
         </div>
       </div>
       <div className="flex w-[60vw] absolute left-[20vw] h-[20vh] top-[32.5vh]">

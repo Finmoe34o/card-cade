@@ -177,9 +177,11 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         }
 
         if (bestDb === null) {
+            const arr = []
+            arr.push(best)
             const { data, error } = await supabase
                 .from("servers")
-                .update({ best_hand: best })
+                .update({ best_hand: arr })
                 .eq("id", serverNum);
         } else {
             if (bestDb.card[0] !== "royal") {
@@ -241,9 +243,11 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                     }
                 } else if (bestDb.card[0] === "high") {
                     if (best.card[0] !== "high" || best.card[1] > bestDb.card[1]) {
+                        const arr = []
+                        arr.push(best)
                         const { data, error } = await supabase
                             .from("servers")
-                            .update({ best_hand: best })
+                            .update({ best_hand: arr })
                             .eq("id", serverNum);
                     }
                 }
