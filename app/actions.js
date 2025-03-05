@@ -71,7 +71,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 pairNum2Count === 1 ? (handType = "twoPair", pairNums.push(pairNum), pairNums.push(pairNum2)) : pairNum2Count === 1 ? (handType = "twoPair", pairNums.push(pairNum), pairNums.push(pairNum2)) : ""
             }
         }
-        // do pair and stuff comparison
+        
         const straightAndFlushCheck = () => {
             const cardValsArr = ["J", "Q", "K", "A"]
             const straightCheck = () => {
@@ -306,7 +306,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .from('servers')
             .update({ "active_players": newArr })
             .eq("id", serverNum)
-
+// add best hand arr functionality and make side pots and all revisit on raise.
     } else if (bet > serverObject.min_bet) {
         const { data, error } = await supabase
             .from("servers")
