@@ -13,6 +13,12 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     const minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
     let contributions = serverObject.contributions
+    const updatedContributions = contributions.map(obj => { 
+        if (obj.keys === playerNum) {
+            return { ...obj, playerNum: contributions[playerNum] + bet };
+        }
+        return obj;
+    });
     // get vars
 
     const cardCheck = (river, hand) => {
@@ -295,7 +301,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     let stackSizes = { ...serverObject.stack_sizes };
     const { data, error } = await supabase
         .from("servers")
-        .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers })
+        .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers, contributions: updatedContributions })
         .eq('id', serverNum);
     if (bet === 0) {
 
