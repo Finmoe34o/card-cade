@@ -12,6 +12,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     pot = pot + bet
     const minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
+    let contributions = serverObject.contributions
     // get vars
 
     const cardCheck = (river, hand) => {
@@ -307,14 +308,21 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({ "active_players": newArr })
             .eq("id", serverNum)
 // add best hand arr functionality and make side pots and all revisit on raise.
-    } else if (bet > serverObject.min_bet) {
+    } if (bet > serverObject.min_bet) {
         const { data, error } = await supabase
             .from("servers")
             .update({ "min_bet": bet })
             .eq("id", serverNum)
     }
-    if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 7 - big_Blind)) {
-        while (!activePlayers.includes(turn) && activePlayers.length) {
+
+    const first = contributions.1
+    let reRun = false
+    for (let i = 0; i < Objects.keys(contributions).length; i++ ) {
+        contributions[i] !== first activePlayers.includes(i) ? (reRun = true, break) : continue 
+    }
+    
+    if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 7 - big_Blind) || reRun) {
+        while (!activePlayers.includes(turn) && activePlayers.length > 0) {
             turn === 6 ? turn = 1 : turn++
         }
         const { data, error } = await supabase
@@ -334,7 +342,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         } else {
             roundRestart()
             round = 1
-            big_Blind === 6 ? big_Blind = 1 : big_Blind++
+            big_Blind === 6 ? big_Blind = 1 : big_Blind
+            big_Blind === 6 ? turn = 1: turn = big_Blind + 1
             const bestDb = serverObject.best_hand
             stackSizes[Number(bestDb.num)] = stackSizes[Number(bestDb.num)] + pot
             console.log("\n\n\n\n\n\n ", stackSizes, bestDb.num, stackSizes[Number(bestDb.num)], pot)
