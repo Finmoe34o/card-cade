@@ -12,6 +12,13 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     pot = pot + bet
     const minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
+    let contributions = serverObject.contributions
+    const updatedContributions = contributions.map(obj => {
+        if (obj.keys === playerNum) {
+            return { ...obj, playerNum: contributions[playerNum] + bet };
+        }
+        return obj;
+    });
     // get vars
 
     const cardCheck = (river, hand) => {
@@ -71,7 +78,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 pairNum2Count === 1 ? (handType = "twoPair", pairNums.push(pairNum), pairNums.push(pairNum2)) : pairNum2Count === 1 ? (handType = "twoPair", pairNums.push(pairNum), pairNums.push(pairNum2)) : ""
             }
         }
-        // do pair and stuff comparison
+
         const straightAndFlushCheck = () => {
             const cardValsArr = ["J", "Q", "K", "A"]
             const straightCheck = () => {
@@ -299,7 +306,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     let stackSizes = { ...serverObject.stack_sizes };
     const { data, error } = await supabase
         .from("servers")
-        .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers })
+        .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers, contributions: updatedContributions })
         .eq('id', serverNum);
     if (bet === 0) {
 
@@ -311,15 +318,17 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .from('servers')
             .update({ "active_players": newArr })
             .eq("id", serverNum)
-
-    } else if (bet > serverObject.min_bet) {
+        // add best hand arr functionality and make side pots and all revisit on raise.
+    } if (bet > serverObject.min_bet) {
         const { data, error } = await supabase
             .from("servers")
             .update({ "min_bet": bet })
             .eq("id", serverNum)
     }
     if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 7 - big_Blind)) {
-        turn === 6 ? turn = 1 : turn++
+        while (!activePlayers.includes(turn) && activePlayers.length) {
+            turn === 6 ? turn = 1 : turn++
+        }
         const { data, error } = await supabase
             .from("servers")
             .update({ "turn": turn })
@@ -336,7 +345,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
 
         } else {
             round = 1
-            big_Blind === 6 ? big_Blind = 1 : big_Blind++
+            big_Blind === 6 ? big_Blind = 1 : big_Blind
+            big_Blind === 6 ? turn = 1 : turn = big_Blind + 1
             const bestDb = serverObject.best_hand
             for (let i = 0; i < bestDb.length; i++) {
                 isSwapped = false;
