@@ -88,7 +88,7 @@ export default async function page() {
       let suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
       let num2 
       let copy = true
-      while (copy) {
+      /*while (copy) {
         const cardVals = ["J","Q","K","A"]
         copy = false
         num2 = Math.floor(Math.random() * 13)
@@ -109,7 +109,10 @@ export default async function page() {
             }
           }
         }
-      }  
+      }*/
+      while (cards[suit][num2] === undefined) {
+        num2 = Math.floor(Math.random() * 13)
+      }
       const card = cards[suit][num2]
       delete cards[suit][num2]
       type === "hand" ? (hand.push(suit, `${card}`)) : river.push(suit, `${card}`)
