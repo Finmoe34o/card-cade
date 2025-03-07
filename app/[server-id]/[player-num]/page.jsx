@@ -95,12 +95,12 @@ export default async function page() {
         let num2Plus = num2 + 2
         num2Plus === 1 ? num2Plus = "A" : num2Plus > 10 ? num2Plus = cardVals[num2Plus - 11] : null  
         for (let i = 0; i < 10;i = i + 2) {
-          if (servers[serverNum - 1].river[i] === null || (servers[serverNum - 1].river[i] === suit && servers[serverNum - 1].river[i + 1] === num2Plus)) {
+          if (servers[serverNum - 1].river[i] === null || (servers[serverNum - 1].river[i] === suit && servers[serverNum - 1].river[i + 1] === num2Plus) || (servers[serverNum - 1][i] === suit && servers[serverNum - 1].river[i + 1] === num2)) {
             copy = true
             break
           }
         } if (!copy) {
-          for (let i = 0; i < 30; i = i + 2) {
+          for (let i = 0; i < 25; i = i + 2) {
             if (i % 5 === 0 && i > 0) {
               i++
             } else if (servers[serverNum - 1].player_cards[i] === null || (servers[serverNum - 1].player_cards[i] === suit && servers[serverNum - 1].player_cards[i + 1] === num2)) {
@@ -130,7 +130,7 @@ export default async function page() {
               cardGen("river",i)
           }
           
-      for (let i = 1; i < 7; i++) {
+      for (let i = 1; i < 6; i++) {
         cardGen("hand",1)
         cardGen("hand",2)
         hand.push(i)
@@ -145,9 +145,9 @@ export default async function page() {
     
 
  
-      if (turn === null || turn === undefined || turn === 7) {
+      if (turn === null || turn === undefined || turn === 6) {
         const big_blind = servers[serverNum - 1].big_blind
-        bigBlind === 6 ? turn = 1 : turn = bigBlind + 1
+        bigBlind === 5 ? turn = 1 : turn = bigBlind + 1
         const { data, error } = await supabase
                 .from('servers')
                 .update({ "turn": turn })

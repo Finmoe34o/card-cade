@@ -122,7 +122,8 @@ export default function page({serverObject, playerNum}) {
          <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
-          <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>        
+          <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
+          <div className="text-white absolute text-center mx-auto w-[120px] top-[20vh]">{stackSize}</div>
           <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className=" text-white absolute top-[25vh] left-[25vw] w-[50vw] h-[20vw]">
           <div className="flex absolute justify-between w-[50vw] h-[20vh]">

@@ -38,7 +38,7 @@ export default async function page() {
         let serverNum
         let playerNum
         for (let i = 0; i < servers.length; i++) {
-            if (servers[i].players < 6) {
+            if (servers[i].players < 5) {
                 serverNum = servers[i].id
                 playerNum = servers[i].players
                 break;
