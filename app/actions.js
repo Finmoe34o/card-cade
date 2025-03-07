@@ -13,7 +13,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     const minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
     let contributions = serverObject.contributions
-    console.log(contributions)
     const updatedContributions = Object.keys(contributions).forEach(function (key, index) {
         if (key === playerNum) {
             return { ...key, playerNum: contributions[playerNum] + bet };
@@ -188,8 +187,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .from("servers")
             .update({ best_hand: bestDb })
             .eq("id", serverNum)
-        const comparison = async (i) => {
-            if (bestDb === null) {
+        const comparison = async (set1, set2) => {
+            if (set2 === null) {
                 const arr = [];
                 arr.push(best)
                 const { data, error } = await supabase
@@ -327,7 +326,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .eq("id", serverNum)
     }
     if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 6 - big_Blind)) {
-        while (!activePlayers.includes(turn) && activePlayers.length) {
+        turn === 5 ? turn = 1 : turn++
+        while (!activePlayers.includes(Number(turn)) && activePlayers.length > 0) {
             turn === 5 ? turn = 1 : turn++
         }
         const { data, error } = await supabase
@@ -356,19 +356,18 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 for (let j = 0; j < bestDb.length - i - 1; j++) {
                     const river = serverObject.river
                     const index = Number(bestDb[j])
-                    const hand = [serverObject.player_cards[(bestDb - 1) * 5], (serverObject.player_cards[(bestDb - 1) * 5] + 1), (serverObject.player_cards[(bestDb - 1) * 5] + 2), (serverObject.player_cards[(bestDb - 1) * 5] + 3)]
-                    if (array[j] > array[j + 1]) {
+                    const hand = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5] + 1), (serverObject.player_cards[(index - 1) * 5] + 2), (serverObject.player_cards[(index - 1) * 5] + 3)]
+                    console.log(cardCheck(river, hand)[1])
+                    /*if (array[j] > array[j + 1]) {
                         // Swap elements
                         [array[j], array[j + 1]] = [array[j + 1], array[j]];
                         isSwapped = true;
-                    }
+                    }*/
                 }
                 if (!isSwapped)
                     break;
-                console.log(bestDb)
             }
             stackSizes[Number(bestDb.num)] = stackSizes[Number(bestDb.num)] + pot
-            console.log("\n\n\n\n\n\n ", stackSizes, bestDb.num, stackSizes[Number(bestDb.num)], pot)
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })
