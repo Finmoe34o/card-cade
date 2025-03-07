@@ -325,9 +325,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({ "min_bet": bet })
             .eq("id", serverNum)
     }
-    if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 7 - big_Blind)) {
+    if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 6 - big_Blind)) {
         while (!activePlayers.includes(turn) && activePlayers.length) {
-            turn === 6 ? turn = 1 : turn++
+            turn === 5 ? turn = 1 : turn++
         }
         const { data, error } = await supabase
             .from("servers")
@@ -337,16 +337,16 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     else {
 
         if (round === 1) {
-            big_Blind === 6 ? turn = 1 : turn = big_Blind + 1
+            big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             round++
         } else if (round < 4) {
-            big_Blind > 2 ? turn = big_Blind - 2 : turn = 7 - big_Blind
+            big_Blind > 2 ? turn = big_Blind - 2 : turn = 6 - big_Blind
             round++
 
         } else {
             round = 1
-            big_Blind === 6 ? big_Blind = 1 : big_Blind
-            big_Blind === 6 ? turn = 1 : turn = big_Blind + 1
+            big_Blind === 5 ? big_Blind = 1 : big_Blind
+            big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             const bestDb = serverObject.best_hand
             for (let i = 0; i < bestDb.length; i++) {
                 isSwapped = false;
