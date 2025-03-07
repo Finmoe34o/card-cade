@@ -13,11 +13,12 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     const minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
     let contributions = serverObject.contributions
-    const updatedContributions = contributions.map(obj => {
-        if (obj.keys === playerNum) {
-            return { ...obj, playerNum: contributions[playerNum] + bet };
+    console.log(contributions)
+    const updatedContributions = Object.keys(contributions).forEach(function (key, index) {
+        if (key === playerNum) {
+            return { ...key, playerNum: contributions[playerNum] + bet };
         }
-        return obj;
+        return key;
     });
     // get vars
 
@@ -348,11 +349,15 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             big_Blind === 5 ? big_Blind = 1 : big_Blind
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             const bestDb = serverObject.best_hand
+            let isSwapped
             for (let i = 0; i < bestDb.length; i++) {
                 isSwapped = false;
 
                 for (let j = 0; j < bestDb.length - i - 1; j++) {
-                    if (array[j], array[j + 1]) {
+                    const river = serverObject.river
+                    const index = Number(bestDb[j])
+                    const hand = [serverObject.player_cards[(bestDb - 1) * 5], (serverObject.player_cards[(bestDb - 1) * 5] + 1), (serverObject.player_cards[(bestDb - 1) * 5] + 2), (serverObject.player_cards[(bestDb - 1) * 5] + 3)]
+                    if (array[j] > array[j + 1]) {
                         // Swap elements
                         [array[j], array[j + 1]] = [array[j + 1], array[j]];
                         isSwapped = true;
@@ -372,7 +377,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
 
         const { data, error } = await supabase
             .from("servers")
-            .update({ "round": round, "turn": turn, "big_blind": big_Blind, "stack_sizes": stackSizes })
+            .update({ "round": round, "turn": turn, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
             .eq("id", serverNum)
     }
 }
