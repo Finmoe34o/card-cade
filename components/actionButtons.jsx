@@ -147,19 +147,19 @@ export default function page({serverObject, playerNum}) {
       </div>
       <div className="w-[100vw] h-[100vh]">
         <div className=" absolute left-[15vw] top-[65vh]">
-          <div className={`${numOfPlayers >= 2 ? "block" : "block"} ${Number(playerNum) < 6 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 2 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className="text-white">{ pNum < 5 ? serverObject.big_blind === pNum + 1 ? "big blind": null: serverObject.big_blind === pNum - 4? "big blind": null }</div>
         </div>
         <div className="absolute left-[15vw] top-[9vh]">
-          <div className={`${numOfPlayers >= 3 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 3 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className="text-white text-center">{ pNum < 4 ? serverObject.big_blind === pNum + 2 ? "big blind": null: serverObject.big_blind === pNum - 3? "big blind": null }</div>
         </div>
         <div className="absolute right-[15vw] top-[9vh]">
-          <div className={`${numOfPlayers >= 4 ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 4 ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className="text-white">{ pNum < 3 ? serverObject.big_blind === pNum + 3 ? "big blind": null: serverObject.big_blind === pNum - 2? "big blind": null }</div>
         </div>
         <div className="absolute right-[15vw] top-[65vh]">
-          <div className={`${numOfPlayers >= 5 ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 5 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 5 ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className="text-white">{ pNum < 2 ? serverObject.big_blind === pNum + 4 ? "big blind": null: serverObject.big_blind === pNum - 1? "big blind": null }</div>
         </div>
       </div>

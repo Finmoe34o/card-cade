@@ -15,6 +15,7 @@ export default async function page() {
         .select("*")
     const hand = []
     const river = []
+    const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
     const activePlayers = servers[serverNum - 1].active_players
     let turn = servers[serverNum - 1].turn
     const round = servers[serverNum - 1].round
@@ -83,33 +84,10 @@ export default async function page() {
     }
   
     const cardGen = (type) => {
-      const cards = { "spades": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "hearts": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "diamonds": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"], "clubs": [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] }
+      
       let num1 = Math.ceil(Math.random() * 4)
       let suit = num1 === 1 ? "spades" : num1 === 2 ? "hearts" : num1 === 3 ? "diamonds" : "clubs"
-      let num2 
-      let copy = true
-      /*while (copy) {
-        const cardVals = ["J","Q","K","A"]
-        copy = false
-        num2 = Math.floor(Math.random() * 13)
-        let num2Plus = num2 + 2
-        num2Plus === 1 ? num2Plus = "A" : num2Plus > 10 ? num2Plus = cardVals[num2Plus - 11] : null  
-        for (let i = 0; i < 10;i = i + 2) {
-          if (servers[serverNum - 1].river[i] === null || (servers[serverNum - 1].river[i] === suit && servers[serverNum - 1].river[i + 1] === num2Plus) || (servers[serverNum - 1][i] === suit && servers[serverNum - 1].river[i + 1] === num2)) {
-            copy = true
-            break
-          }
-        } if (!copy) {
-          for (let i = 0; i < 25; i = i + 2) {
-            if (i % 5 === 0 && i > 0) {
-              i++
-            } else if (servers[serverNum - 1].player_cards[i] === null || (servers[serverNum - 1].player_cards[i] === suit && servers[serverNum - 1].player_cards[i + 1] === num2)) {
-              copy = true
-              break
-            }
-          }
-        }
-      }*/
+      let num2
       while (cards[suit][num2] === undefined) {
         num2 = Math.floor(Math.random() * 13)
       }

@@ -4,44 +4,52 @@ import { createClient } from "@/utils/supabase/server"
 
 export async function sendValuesToServer(bet, serverObject, playerNum) {
     const comparison = async (set1, set2) => {
+        if (!isNaN(set1[1])) {
+            const arrValues = ["J", "Q", "K", "A"];
+            set1[1] !== undefined ? set1[1] = 10 + arrValues.indexOf(set1[1]) : null;
+        }
+        if (!isNaN(set2[1])) {
+            const arrValues = ["J", "Q", "K", "A"];
+            set2[1] !== undefined ? set2[1] = 10 + arrValues.indexOf(set1[1]) : null;
+        }
         if (set2 === null) {
             return true
         } else {
-            if (set2[i][0] !== "royal") {
-                if (set2[i][0] === "strflu") {
-                    if (set1[0] === "royal" || (set1[0] === "strflu" && set1[1] > set2[i][1])) {
+            if (set2[0] !== "royal") {
+                if (set2[0] === "strflu") {
+                    if (set1[0] === "royal" || (set1[0] === "strflu" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "quads") {
-                    if ((set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "quads" && set1[1] > set2[i][1])) {
+                } else if (set2[0] === "quads") {
+                    if ((set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "quads" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "full") {
-                    if ((set1[0] === "quads" || set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "full" && set1[1] > set2[i][1])) {
+                } else if (set2[0] === "full") {
+                    if ((set1[0] === "quads" || set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "full" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "flush") {
-                    if ((set1[0] === "quads" || set1[0] === "full" || set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "flush" && set1[1] > set2[i][1])) {
+                } else if (set2[0] === "flush") {
+                    if ((set1[0] === "quads" || set1[0] === "full" || set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "flush" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "straight") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "trips" && set1[0] !== "straight" && set1[0] !== "twoPair") || (set1[0] === "straight" && set1[1] > set2[i][1])) {
+                } else if (set2[0] === "straight") {
+                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "trips" && set1[0] !== "straight" && set1[0] !== "twoPair") || (set1[0] === "straight" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "trips") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "twoPair" && set1[0] !== "trips") || (set1[0] === "trips" && set1[1] > set2[i][1])) {
+                } else if (set2[0] === "trips") {
+                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "twoPair" && set1[0] !== "trips") || (set1[0] === "trips" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "twoPair") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "trips") || (set1[0] === "twoPair" && set1[1] > set2[i][1])) {
+                } else if (set2[0] === "twoPair") {
+                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "trips") || (set1[0] === "twoPair" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "pair") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair") || (set1[0] === "pair" && set1[1] > set2[i][1])) {
+                } else if (set2[0] === "pair") {
+                    if ((set1[0] !== "high" && set1[0] !== "pair") || (set1[0] === "pair" && set1[1] > set2[1])) {
                         return true;
                     }
-                } else if (set2[i][0] === "high") {
-                    if (set1[0] !== "high" || set1[1] > set2[i][1]) {
+                } else if (set2[0] === "high") {
+                    if (set1[0] !== "high" || set1[1] > set2[1]) {
                         return true;
                     }
                 }
@@ -126,7 +134,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 pairNum2Count === 1 ? (handType = "twoPair", pairNums.push(pairNum), pairNums.push(pairNum2)) : pairNum2Count === 1 ? (handType = "twoPair", pairNums.push(pairNum), pairNums.push(pairNum2)) : ""
             }
         }
-
         const straightAndFlushCheck = () => {
             const cardValsArr = ["J", "Q", "K", "A"]
             const straightCheck = () => {
@@ -224,17 +231,14 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         const hand = []
         const player_cards = serverObject.player_cards
         hand.push(player_cards[mutiplier], player_cards[mutiplier + 1], player_cards[mutiplier + 2], player_cards[mutiplier + 3])
-        const best = { "card": cardCheck(river, hand), "num": playerNum }
+        /*const best = { "card": cardCheck(river, hand), "num": playerNum }
         const bestDb = serverObject.best_hand
-        if (!isNaN(best.card[1])) {
-            const arrValues = ["J", "Q", "K", "A"];
-            best.card[1] !== undefined && best.card[1] !== playerNum ? best.card[1] = 10 + arrValues.indexOf(best.card[1]) : null;
-        }
+
         bestDb.push(best)
         const { data, error } = await supabase
             .from("servers")
             .update({ best_hand: bestDb })
-            .eq("id", serverNum)
+            .eq("id", serverNum)*/
     }
 
     const roundRestart = async (round) => {
@@ -277,9 +281,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({ "min_bet": bet })
             .eq("id", serverNum)
     }
-    if ((round === 1 && turn !== big_Blind) || (round > 1 && turn > 3 && turn !== big_Blind - 2) || (round > 1 && turn < 3 && turn !== 6 - big_Blind)) {
+    if ((round === 1 && turn !== big_Blind) || (round > 1 && big_Blind > 2 && turn !== big_Blind - 2) || (round > 1 && big_Blind < 3 && turn !== 5 + big_Blind - 2)) {
         turn === 5 ? turn = 1 : turn++
-        while (!activePlayers.includes(Number(turn)) && activePlayers.length > 0) {
+        while (!activePlayers.includes(Number(turn)) && activePlayers.length > 0 && round > 1) {
             turn === 5 ? turn = 1 : turn++
         }
         const { data, error } = await supabase
@@ -293,7 +297,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             round++
         } else if (round < 4) {
-            big_Blind > 2 ? turn = big_Blind - 2 : turn = 6 - big_Blind
+            big_Blind > 2 ? turn = big_Blind - 2 : big_Blind = 5 + big_Blind - 2
             round++
 
         } else {
@@ -302,18 +306,28 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             const bestDb = serverObject.best_hand
             let isSwapped
-            const array = []
-            for (let i = 0; i < bestDb.length; i++) {
+            const array = [1, 2, 3, 4, 5, 6]
+            const arr = [serverObject.river]
+            for (let i = 0; i < activePlayers.length; i++) {
                 isSwapped = false;
-
-                for (let j = 0; j < bestDb.length - i - 1; j++) {
+                for (let j = 0; j < activePlayers.length - i - 1; j++) {
                     const river = serverObject.river
-                    const index = j
-                    const hand1 = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5] + 1), (serverObject.player_cards[(index - 1) * 5] + 2), (serverObject.player_cards[(index - 1) * 5] + 3)]
-                    const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5] + 1), (serverObject.player_cards[(index) * 5] + 2), (serverObject.player_cards[(index) * 5] + 3)]
+                    const index = activePlayers[j]
+                    const hand1 = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5 + 1]), (serverObject.player_cards[(index - 1) * 5 + 2]), (serverObject.player_cards[(index - 1) * 5 + 3])]
+                    const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5 + 1]), (serverObject.player_cards[(index) * 5 + 2]), (serverObject.player_cards[(index) * 5 + 3])]
                     const value1 = cardCheck(river, hand1)
                     const value2 = cardCheck(river, hand2)
-                    if (comparison(value1, value2)) {
+                    !arr.includes(j) ? arr.push("a", value1, j, "a") : null
+
+
+
+
+                    //pass it properly idito
+
+
+
+
+                    if ((await comparison(value1, value2)) === true) {
                         [array[j], array[j + 1]] = [array[j + 1], array[j]];
                         isSwapped = true;
                     }
@@ -322,6 +336,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 if (!isSwapped)
                     break;
             }
+            console.log(arr)
+            console.log("FINAL ORDER", array)
             //stackSizes[Number(bestDb.num)] = stackSizes[Number(bestDb.num)] + pot
             const { data, error } = await supabase
                 .from("servers")
