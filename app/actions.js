@@ -41,7 +41,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                         return true;
                     }
                 } else if (set2[0] === "twoPair") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "trips") || (set1[0] === "twoPair" && set1[1] > set2[1])) {
+                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "twoPair") || (set1[0] === "twoPair" && set1[1] > set2[1])) {
                         return true;
                     }
                 } else if (set2[0] === "pair") {
@@ -306,8 +306,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             const bestDb = serverObject.best_hand
             let isSwapped
-            const array = [1, 2, 3, 4, 5, 6]
-            const arr = [serverObject.river]
+            const array = [1, 2, 3, 4, 5]
             for (let i = 0; i < activePlayers.length; i++) {
                 isSwapped = false;
                 for (let j = 0; j < activePlayers.length - i - 1; j++) {
@@ -317,26 +316,15 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                     const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5 + 1]), (serverObject.player_cards[(index) * 5 + 2]), (serverObject.player_cards[(index) * 5 + 3])]
                     const value1 = cardCheck(river, hand1)
                     const value2 = cardCheck(river, hand2)
-                    !arr.includes(j) ? arr.push("a", value1, j, "a") : null
-
-
-
-
-                    //pass it properly idito
-
-
-
-
+                    console.log("\n", value1, "/n", value2, "\n", (await comparison(value1, value2)))
                     if ((await comparison(value1, value2)) === true) {
                         [array[j], array[j + 1]] = [array[j + 1], array[j]];
                         isSwapped = true;
                     }
-                    console.log(array)
                 }
                 if (!isSwapped)
                     break;
             }
-            console.log(arr)
             console.log("FINAL ORDER", array)
             //stackSizes[Number(bestDb.num)] = stackSizes[Number(bestDb.num)] + pot
             const { data, error } = await supabase
