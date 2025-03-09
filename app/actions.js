@@ -310,57 +310,81 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                         }
                     }
                 }
-                const best = { 1: null, 2: null, 3: null, 4: null, 5: null }
+                const best = { 1: null, 2: null, 3: null, 4: null, 5: null };
                 for (let i = 1; i < 6; i++) {
                     if (obj[i] !== null) {
-                        best[i] = (obj[i])
+                        best[i] = obj[i];
                     }
                 }
-                const arr = best
-                for (var i = 0; i < best.length; i++) {
 
-                    for (var j = 0; j < (best.length - i - 1); j++) {
-                        if (arr[j] !== undefined && arr[j][0] <= arr[j + 1][0]) {
-                            if (arr[j][0] === arr[j + 1][0]) {
-                                for (let k = 0; k < arr[j].length; k++) {
-                                    isNaN(arr[j][1][k]) ? arr[j][1][k] === "J" ? arr[j][1][k] = 11 : arr[j][1][k] === "Q" ? arr[j][1][k] = 12 : arr[j][1][k] === "K" ? arr[j][1][k] = 13 : arr[j][1][k] === "A" ? arr[j][1][k] = 14 : null : null
-                                    isNaN(arr[j + 1][1][k]) ? arr[j + 1][1][k] === "J" ? arr[j + 1][1][k] = 11 : arr[j + 1][1][k] === "Q" ? arr[j + 1][1][k] = 12 : arr[j + 1][1][k] === "K" ? arr[j + 1][1][k] = 13 : arr[j + 1][1][k] === "A" ? arr[j + 1][1][k] = 14 : null : null
-                                    if (arr[j][1][k] < arr[j + 1][1][k]) {
-                                        var temp = arr[j]
-                                        arr[j] = arr[j + 1]
-                                        arr[j + 1] = temp
+                // Create an array of [key, value] pairs
+                const arr = Object.entries(best);
+
+                // Helper function to convert card faces to numeric values
+                const convertCard = (card) => {
+                    return card === "J" ? 11 : card === "Q" ? 12 : card === "K" ? 13 : card === "A" ? 14 : parseInt(card);
+                };
+
+                // Sorting logic
+                for (var i = 0; i < arr.length; i++) {
+                    for (var j = 0; j < arr.length - i - 1; j++) {
+                        if (arr[j][1] !== null && arr[j + 1][1] !== null) {
+                            // Compare primary value (arr[j][1][0])
+                            if (arr[j][1][0] < arr[j + 1][1][0]) {
+                                var temp = arr[j];
+                                arr[j] = arr[j + 1];
+                                arr[j + 1] = temp;
+                            } else if (arr[j][1][0] === arr[j + 1][1][0]) {
+                                // If primary values are equal, compare card ranks
+                                let swapped = false;
+                                for (let k = 0; k < arr[j][1][1].length; k++) {
+                                    let card1 = convertCard(arr[j][1][1][k]);
+                                    let card2 = convertCard(arr[j + 1][1][1][k]);
+                                    if (card1 < card2) {
+                                        var temp = arr[j];
+                                        arr[j] = arr[j + 1];
+                                        arr[j + 1] = temp;
+                                        swapped = true;
+                                        break;
+                                    } else if (card1 > card2) {
+                                        break;
                                     }
                                 }
                             }
-                            var temp = arr[j]
-                            arr[j] = arr[j + 1]
-                            arr[j + 1] = temp
                         }
                     }
                 }
-                return best
+
+                const keyOrder = arr.map(item => item[0]);
+
+                const sortedBest = Object.fromEntries(arr);
+
+                return { best: sortedBest, order: keyOrder };
+
+
             }
-            const best = bestPlayer()
-            console.log(await best)
+            const best = await bestPlayer()
             let empty = false
             let index = 0
             const skipped = []
-            /*while (!empty) {
+            while (!empty && index < 6) {
+                const highest = best.order[index]
                 for (let i = 0; i < 6; i++) {
-
+                    i !== best ? (stackSizes[highest] = stackSizes[highest] + contributions[i], stackSizes[i] = stackSizes[i] - contributions[i]) : null
                 }
                 index++
-            }*/
+            }
+            console.log(contributions, stackSizes)
             //loop through bestPlayer and shiz and subtract from pot and shiz   
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })
             roundRestart()
         }
-
+        let t = big_Blind === 5 ? t = 1 : t = big_Blind + 1
         const { data, error } = await supabase
             .from("servers")
-            .update({ "round": 4, "turn": 5, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
+            .update({ "round": 1, "turn": t, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
             .eq("id", serverNum)
     }
 }
