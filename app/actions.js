@@ -295,31 +295,32 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 let broken
                 for (let i = 9; i > 0 && !broken; i--) {
                     for (let j = 1; j < 6; j++) {
-                        if (obj[j] !== null) {
-                            if (obj[j] === 1) {
-                                bestNum = (obj[j][0])
-                                broken = true
-                                break
-                            } else if (obj[j][0] === i) {
-                                bestNum = (obj[j][0])
-                                broken = true
-                                break
+                        if (obj[j] !== null && obj[j] !== undefined) {
+                            if (obj[j].length > 0) {
+                                if (obj[j][0] === i) {
+                                    bestNum = (obj[j][0])
+                                    broken = true
+                                    break
+                                }
                             }
+                        } else if (obj[j] === 1) {
+                            bestNum = (obj[j][0])
+                            broken = true
+                            break
                         }
                     }
                 }
-                const best = []
+                const best = { 1: null, 2: null, 3: null, 4: null, 5: null }
                 for (let i = 1; i < 6; i++) {
                     if (obj[i] !== null) {
-                        obj[i][0] === bestNum
-                        best.push(obj[i])
+                        best[i] = (obj[i])
                     }
                 }
                 const arr = best
                 for (var i = 0; i < best.length; i++) {
 
                     for (var j = 0; j < (best.length - i - 1); j++) {
-                        if (arr[j][0] <= arr[j + 1][0]) {
+                        if (arr[j] !== undefined && arr[j][0] <= arr[j + 1][0]) {
                             if (arr[j][0] === arr[j + 1][0]) {
                                 for (let k = 0; k < arr[j].length; k++) {
                                     isNaN(arr[j][1][k]) ? arr[j][1][k] === "J" ? arr[j][1][k] = 11 : arr[j][1][k] === "Q" ? arr[j][1][k] = 12 : arr[j][1][k] === "K" ? arr[j][1][k] = 13 : arr[j][1][k] === "A" ? arr[j][1][k] = 14 : null : null
@@ -339,8 +340,18 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 }
                 return best
             }
-            bestPlayer()
-            //loop through bestPlayer and shiz and subtract from pot and shiz
+            const best = bestPlayer()
+            console.log(await best)
+            let empty = false
+            let index = 0
+            const skipped = []
+            /*while (!empty) {
+                for (let i = 0; i < 6; i++) {
+
+                }
+                index++
+            }*/
+            //loop through bestPlayer and shiz and subtract from pot and shiz   
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })
