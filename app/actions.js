@@ -369,8 +369,10 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             const skipped = []
             while (!empty && index < 6) {
                 const highest = best.order[index]
+                empty = true
                 for (let i = 0; i < 6; i++) {
-                    i !== best ? (stackSizes[highest] = stackSizes[highest] + contributions[i], stackSizes[i] = stackSizes[i] - contributions[i]) : null
+                    contributions[i] !== 0 ? empty = false : null
+                    i !== highest && contributions[highest] >= contributions[i] ? (stackSizes[highest] = stackSizes[highest] + contributions[i], stackSizes[i] = stackSizes[i] - contributions[i], contributions[highest] = contributions[highest] - contributions[i]) : i !== highest && contributions[highest] >= contributions[i] ? (stackSizes[highest] = stackSizes[highest] + contributions[highest], contributions[])
                 }
                 index++
             }
