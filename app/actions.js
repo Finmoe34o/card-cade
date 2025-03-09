@@ -3,60 +3,40 @@
 import { createClient } from "@/utils/supabase/server"
 
 export async function sendValuesToServer(bet, serverObject, playerNum) {
-    const comparison = async (set1, set2) => {
-        if (!isNaN(set1[1])) {
-            const arrValues = ["J", "Q", "K", "A"];
-            set1[1] !== undefined ? set1[1] = 10 + arrValues.indexOf(set1[1]) : null;
-        }
-        if (!isNaN(set2[1])) {
-            const arrValues = ["J", "Q", "K", "A"];
-            set2[1] !== undefined ? set2[1] = 10 + arrValues.indexOf(set1[1]) : null;
-        }
-        if (set2 === null) {
-            return true
-        } else {
-            if (set2[0] !== "royal") {
-                if (set2[0] === "strflu") {
-                    if (set1[0] === "royal" || (set1[0] === "strflu" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "quads") {
-                    if ((set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "quads" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "full") {
-                    if ((set1[0] === "quads" || set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "full" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "flush") {
-                    if ((set1[0] === "quads" || set1[0] === "full" || set1[0] === "strflu" || set1[0] === "royal") || (set1[0] === "flush" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "straight") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "trips" && set1[0] !== "straight" && set1[0] !== "twoPair") || (set1[0] === "straight" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "trips") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "twoPair" && set1[0] !== "trips") || (set1[0] === "trips" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "twoPair") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair" && set1[0] !== "twoPair") || (set1[0] === "twoPair" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "pair") {
-                    if ((set1[0] !== "high" && set1[0] !== "pair") || (set1[0] === "pair" && set1[1] > set2[1])) {
-                        return true;
-                    }
-                } else if (set2[0] === "high") {
-                    if (set1[0] !== "high" || set1[1] > set2[1]) {
-                        return true;
-                    }
-                }
+    const comparison = async (set1) => {
+        if (set1[0] === "high") {
+            console.log(set1[1])
+            return [1, set1[1]]
+        } else if (set1[0] === "pair") {
+            return [2, set1[1]]
+        } else if (set1[0] === "twoPair") {
+            isNaN(set1[1][0]) ? set[1][0] === "J" ? set[1][0] = 11 : set[1][0] === "Q" ? set[1][0] = 12 : set[1][0] === "K" ? set[1][0] = 13 : set[1][0] === "A" ? set[1][0] = 14 : isNaN(set1[1][1]) ? set[1][1] === "J" ? set[1][1] = 11 : set[1][1] === "Q" ? set[1][1] = 12 : set[1][1] === "K" ? set[1][1] = 13 : set[1][1] === "A" ? set[1][1] = 14 : null : null : null
+            const newArr = []
+            Number(set[1][0]) > Number(set1[1][1]) ? newArr.push(set1[1][0], set1[1][1]) : newArr.push(set1[1][1], set1[1][0])
+            return [3, newArr];
+        } else if (set1[0] === "trips") {
+            return [4, set1[1]];
+        } else if (set1[0] === "straight") {
+            return [5, set1[1]];
+        } else if (set1[0] === "flush") {
+            return [6, set1[1]];
+        } else if (set1[0] === "full") {
+            const count = [0]
+            for (let i = 0; i < set1[1].length; i++) {
+                isNaN(set1[1][i]) ? set1[1][i] === "J" ? set1[1][i] = 11 : set1[1][i] === "Q" ? set[1][i] = 12 : set[1][i] === "K" ? set[1][i] = 13 : set[1][i] === "A" ? set[1][i] = 14 : null : null
+                count[0] === 0 ? (count[0] = set[1][i], count[1] = 1) : count[0] === set[1][i] ? count[1] = count[1] + 1 : count[2] === 0 ? (count[2] = set[1][i], count[3] = 1) : count[2] === set[1][i] ? count[3] = count[3] + 1 : null
             }
-
+            const newArr = []
+            count[1] === 2 && count[3] === 1 ? newArr.push(count[0], count[2]) : count[3] === 2 && count[1] === 1 ? newArr.push(count[2], count[0]) : count[0] > count[2] ? newArr.push(count[0], count[2]) : newArr.push(count[2], count[0])
+        } else if (set1[0] === "quads") {
+            return [7, set1[1]];
+        } else if (set1[0] === "strflu") {
+            return [8, set1[1]];
+        } else if (set1[0] === "royal") {
+            return [9, set1[1]];
+        } else {
+            return "ERROR"
         }
-        return false
     }
 
     const supabase = await createClient()
@@ -167,7 +147,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                         inARow = 0
                     }
                 }
-                return inARow >= 5 ? [inARow, endOfStraight, sortedArr] : false
+                return inARow >= 5 ? [endOfStraight, inARow, sortedArr] : false
             }
             const flushCheck = () => {
                 let spadesArr = []
@@ -180,7 +160,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                     river[i] === "spades" ? spadesArr.push(river[i + 1]) : river[i] === "hearts" ? heartsArr.push(river[i + 1]) : river[i] === "diamonds" ? diamondsArr.push(river[i + 1]) : clubsArr.push(river[i + 1])
                 }
 
-                return spadesArr.length >= 5 ? spadesArr : heartsArr.length >= 5 ? heartsArr : diamondsArr.length >= 5 ? diamondsArr : clubsArr.length >= 5 ? clubsArr : false
+                return spadesArr.length >= 5 ? "spades" : heartsArr.length >= 5 ? "hearts" : diamondsArr.length >= 5 ? "diamonds" : clubsArr.length >= 5 ? "clubs" : false
 
             }
             const straightFlushCheck = (straightLength, straightEnd, sorted, flushArr) => {
@@ -202,7 +182,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
 
             const straight = straightCheck()
             const flush = flushCheck()
-            const straightFLush = straightFlushCheck(straight[0], straight[1], straight[2], flush)
+            const straightFLush = straightFlushCheck(straight[1], straight[0], straight[2], flush)
             return straight ? flush ? straightFLush ? straightFLush : ["flush", flush] : ["straight", straightCheck()] : false
         }
         const straightOrFlush = straightAndFlushCheck()
@@ -210,18 +190,20 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         if (straightOrFlush === "royal") {
             handType = "royal"
         } else if (handType === "quads") {
-            return handType
+            return [handType, highest]
         } else if (straightOrFlush === "strflu") {
             handType = "strflu"
             highest = straightOrFlush[1]
         } else if (handType === "full") {
-            return handType
+            return [handType, highest]
         } else if (straightOrFlush[0] === "flush") {
             handType = "flush"
             highest = straightOrFlush[1]
         } else if (straightOrFlush[0] === "straight") {
             handType = "straight"
             highest = straightOrFlush[1]
+        } else if (handType === "high") {
+            highest = [hand[1], hand[3]]
         }
         return highest !== undefined ? [handType, highest] : [handType]
     }
@@ -231,14 +213,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         const hand = []
         const player_cards = serverObject.player_cards
         hand.push(player_cards[mutiplier], player_cards[mutiplier + 1], player_cards[mutiplier + 2], player_cards[mutiplier + 3])
-        /*const best = { "card": cardCheck(river, hand), "num": playerNum }
-        const bestDb = serverObject.best_hand
-
-        bestDb.push(best)
-        const { data, error } = await supabase
-            .from("servers")
-            .update({ best_hand: bestDb })
-            .eq("id", serverNum)*/
     }
 
     const roundRestart = async (round) => {
@@ -251,7 +225,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({
                 river: [],
                 player_cards: [],
-                active_players: [],
+                active_players: [1, 2, 3, 4, 5],
                 best_hand: [],
                 min_bet: 50
             })
@@ -274,7 +248,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .from('servers')
             .update({ "active_players": newArr })
             .eq("id", serverNum)
-        // add best hand arr functionality and make side pots and all revisit on raise.
     } if (bet > serverObject.min_bet) {
         const { data, error } = await supabase
             .from("servers")
@@ -304,29 +277,44 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             round = 1
             big_Blind === 5 ? big_Blind = 1 : big_Blind
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
-            const bestDb = serverObject.best_hand
-            let isSwapped
-            const array = [1, 2, 3, 4, 5]
+            const bestPlayer = () => { }
+            const obj = { "1": null, "2": null, "3": null, "4": null, "5": null }
+            const river = serverObject.river
             for (let i = 0; i < activePlayers.length; i++) {
-                isSwapped = false;
-                for (let j = 0; j < activePlayers.length - i - 1; j++) {
-                    const river = serverObject.river
-                    const index = activePlayers[j]
-                    const hand1 = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5 + 1]), (serverObject.player_cards[(index - 1) * 5 + 2]), (serverObject.player_cards[(index - 1) * 5 + 3])]
-                    const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5 + 1]), (serverObject.player_cards[(index) * 5 + 2]), (serverObject.player_cards[(index) * 5 + 3])]
-                    const value1 = cardCheck(river, hand1)
-                    const value2 = cardCheck(river, hand2)
-                    console.log("\n", value1, "/n", value2, "\n", (await comparison(value1, value2)))
-                    if ((await comparison(value1, value2)) === true) {
-                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
-                        isSwapped = true;
+                const index = activePlayers[i]
+                console.log("JDASDBSHABD")
+                const hand1 = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5 + 1]), (serverObject.player_cards[(index - 1) * 5 + 2]), (serverObject.player_cards[(index - 1) * 5 + 3])]
+                const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5 + 1]), (serverObject.player_cards[(index) * 5 + 2]), (serverObject.player_cards[(index) * 5 + 3])]
+                const value1 = cardCheck(river, hand1)
+                const value2 = cardCheck(river, hand2)
+                obj[index] = await comparison(value1)
+            }
+            let bestNum
+            let broken
+            for (let i = 9; i > 0 && !broken; i--) {
+                for (let j = 1; j < 6; j++) {
+                    if (obj[j] !== null) {
+                        if (obj[j][0] === i) {
+                            bestNum = (obj[j][0])
+                            broken = true
+                            break
+                        }
                     }
                 }
-                if (!isSwapped)
-                    break;
             }
-            console.log("FINAL ORDER", array)
-            //stackSizes[Number(bestDb.num)] = stackSizes[Number(bestDb.num)] + pot
+            const best = []
+            for (let i = 1; i < 6; i++) {
+                if (obj[i] !== null) {
+                    obj[i][0] === bestNum
+                    best.push(obj[i])
+                }
+            }
+            for (let i = 0; i < best.length; i++) {
+
+            }
+            console.log(best)
+            //search the rest of obj for same value as bestNum and then sort and distribute
+            //make thing into function then add a skipped list so that the pot can be emptied
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })
@@ -335,7 +323,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
 
         const { data, error } = await supabase
             .from("servers")
-            .update({ "round": round, "turn": turn, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
+            .update({ "round": 4, "turn": 5, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
             .eq("id", serverNum)
     }
 }
