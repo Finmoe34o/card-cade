@@ -5,14 +5,17 @@ import { createClient } from "@/utils/supabase/server"
 export async function sendValuesToServer(bet, serverObject, playerNum) {
     const comparison = async (set1) => {
         if (set1[0] === "high") {
-            console.log(set1[1])
-            return [1, set1[1]]
+            isNaN(set1[1][0]) ? set1[1][0] === "J" ? set1[1][0] = 11 : set1[1][0] === "Q" ? set1[1][0] = 12 : set1[1][0] === "K" ? set1[1][0] = 13 : set1[1][0] === "A" ? set1[1][0] = 14 : isNaN(set1[1][1]) ? set1[1][1] === "J" ? set1[1][1] = 11 : set1[1][1] === "Q" ? set1[1][1] = 12 : set1[1][1] === "K" ? set1[1][1] = 13 : set1[1][1] === "A" ? set1[1][1] = 14 : null : null : null
+            const newArr = []
+            Number(set1[1][0]) > Number(set1[1][1]) ? newArr.push(set1[1][0], set1[1][1]) : newArr.push(set1[1][1], set1[1][0])
+            return [1, newArr]
         } else if (set1[0] === "pair") {
+            isNaN(set1[1][0]) ? set1[1][0] === "J" ? set1[1][0] = 11 : set1[1][0] === "Q" ? set1[1][0] = 12 : set1[1][0] === "K" ? set1[1][0] = 13 : set1[1][0] === "A" ? set1[1][0] = 14 : null : null
             return [2, set1[1]]
         } else if (set1[0] === "twoPair") {
-            isNaN(set1[1][0]) ? set[1][0] === "J" ? set[1][0] = 11 : set[1][0] === "Q" ? set[1][0] = 12 : set[1][0] === "K" ? set[1][0] = 13 : set[1][0] === "A" ? set[1][0] = 14 : isNaN(set1[1][1]) ? set[1][1] === "J" ? set[1][1] = 11 : set[1][1] === "Q" ? set[1][1] = 12 : set[1][1] === "K" ? set[1][1] = 13 : set[1][1] === "A" ? set[1][1] = 14 : null : null : null
+            isNaN(set1[1][0]) ? set1[1][0] === "J" ? set1[1][0] = 11 : set1[1][0] === "Q" ? set1[1][0] = 12 : set1[1][0] === "K" ? set1[1][0] = 13 : set1[1][0] === "A" ? set1[1][0] = 14 : isNaN(set1[1][1]) ? set1[1][1] === "J" ? set1[1][1] = 11 : set1[1][1] === "Q" ? set1[1][1] = 12 : set1[1][1] === "K" ? set1[1][1] = 13 : set1[1][1] === "A" ? set1[1][1] = 14 : null : null : null
             const newArr = []
-            Number(set[1][0]) > Number(set1[1][1]) ? newArr.push(set1[1][0], set1[1][1]) : newArr.push(set1[1][1], set1[1][0])
+            Number(set1[1][0]) > Number(set1[1][1]) ? newArr.push(set1[1][0], set1[1][1]) : newArr.push(set1[1][1], set1[1][0])
             return [3, newArr];
         } else if (set1[0] === "trips") {
             return [4, set1[1]];
@@ -23,8 +26,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
         } else if (set1[0] === "full") {
             const count = [0]
             for (let i = 0; i < set1[1].length; i++) {
-                isNaN(set1[1][i]) ? set1[1][i] === "J" ? set1[1][i] = 11 : set1[1][i] === "Q" ? set[1][i] = 12 : set[1][i] === "K" ? set[1][i] = 13 : set[1][i] === "A" ? set[1][i] = 14 : null : null
-                count[0] === 0 ? (count[0] = set[1][i], count[1] = 1) : count[0] === set[1][i] ? count[1] = count[1] + 1 : count[2] === 0 ? (count[2] = set[1][i], count[3] = 1) : count[2] === set[1][i] ? count[3] = count[3] + 1 : null
+                isNaN(set1[1][i]) ? set1[1][i] === "J" ? set1[1][i] = 11 : set1[1][i] === "Q" ? set1[1][i] = 12 : set1[1][i] === "K" ? set1[1][i] = 13 : set1[1][i] === "A" ? set1[1][i] = 14 : null : null
+                count[0] === 0 ? (count[0] = set1[1][i], count[1] = 1) : count[0] === set1[1][i] ? count[1] = count[1] + 1 : count[2] === 0 ? (count[2] = set1[1][i], count[3] = 1) : count[2] === set1[1][i] ? count[3] = count[3] + 1 : null
             }
             const newArr = []
             count[1] === 2 && count[3] === 1 ? newArr.push(count[0], count[2]) : count[3] === 2 && count[1] === 1 ? newArr.push(count[2], count[0]) : count[0] > count[2] ? newArr.push(count[0], count[2]) : newArr.push(count[2], count[0])
@@ -277,44 +280,67 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             round = 1
             big_Blind === 5 ? big_Blind = 1 : big_Blind
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
-            const bestPlayer = () => { }
-            const obj = { "1": null, "2": null, "3": null, "4": null, "5": null }
-            const river = serverObject.river
-            for (let i = 0; i < activePlayers.length; i++) {
-                const index = activePlayers[i]
-                console.log("JDASDBSHABD")
-                const hand1 = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5 + 1]), (serverObject.player_cards[(index - 1) * 5 + 2]), (serverObject.player_cards[(index - 1) * 5 + 3])]
-                const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5 + 1]), (serverObject.player_cards[(index) * 5 + 2]), (serverObject.player_cards[(index) * 5 + 3])]
-                const value1 = cardCheck(river, hand1)
-                const value2 = cardCheck(river, hand2)
-                obj[index] = await comparison(value1)
-            }
-            let bestNum
-            let broken
-            for (let i = 9; i > 0 && !broken; i--) {
-                for (let j = 1; j < 6; j++) {
-                    if (obj[j] !== null) {
-                        if (obj[j][0] === i) {
-                            bestNum = (obj[j][0])
-                            broken = true
-                            break
+            const bestPlayer = async () => {
+                const obj = { "1": null, "2": null, "3": null, "4": null, "5": null }
+                const river = serverObject.river
+                for (let i = 0; i < activePlayers.length; i++) {
+                    const index = activePlayers[i]
+                    const hand1 = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5 + 1]), (serverObject.player_cards[(index - 1) * 5 + 2]), (serverObject.player_cards[(index - 1) * 5 + 3])]
+                    const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5 + 1]), (serverObject.player_cards[(index) * 5 + 2]), (serverObject.player_cards[(index) * 5 + 3])]
+                    const value1 = cardCheck(river, hand1)
+                    const value2 = cardCheck(river, hand2)
+                    obj[index] = await comparison(value1)
+                }
+                let bestNum
+                let broken
+                for (let i = 9; i > 0 && !broken; i--) {
+                    for (let j = 1; j < 6; j++) {
+                        if (obj[j] !== null) {
+                            if (obj[j] === 1) {
+                                bestNum = (obj[j][0])
+                                broken = true
+                                break
+                            } else if (obj[j][0] === i) {
+                                bestNum = (obj[j][0])
+                                broken = true
+                                break
+                            }
                         }
                     }
                 }
-            }
-            const best = []
-            for (let i = 1; i < 6; i++) {
-                if (obj[i] !== null) {
-                    obj[i][0] === bestNum
-                    best.push(obj[i])
+                const best = []
+                for (let i = 1; i < 6; i++) {
+                    if (obj[i] !== null) {
+                        obj[i][0] === bestNum
+                        best.push(obj[i])
+                    }
                 }
-            }
-            for (let i = 0; i < best.length; i++) {
+                const arr = best
+                for (var i = 0; i < best.length; i++) {
 
+                    for (var j = 0; j < (best.length - i - 1); j++) {
+                        if (arr[j][0] <= arr[j + 1][0]) {
+                            if (arr[j][0] === arr[j + 1][0]) {
+                                for (let k = 0; k < arr[j].length; k++) {
+                                    isNaN(arr[j][1][k]) ? arr[j][1][k] === "J" ? arr[j][1][k] = 11 : arr[j][1][k] === "Q" ? arr[j][1][k] = 12 : arr[j][1][k] === "K" ? arr[j][1][k] = 13 : arr[j][1][k] === "A" ? arr[j][1][k] = 14 : null : null
+                                    isNaN(arr[j + 1][1][k]) ? arr[j + 1][1][k] === "J" ? arr[j + 1][1][k] = 11 : arr[j + 1][1][k] === "Q" ? arr[j + 1][1][k] = 12 : arr[j + 1][1][k] === "K" ? arr[j + 1][1][k] = 13 : arr[j + 1][1][k] === "A" ? arr[j + 1][1][k] = 14 : null : null
+                                    if (arr[j][1][k] < arr[j + 1][1][k]) {
+                                        var temp = arr[j]
+                                        arr[j] = arr[j + 1]
+                                        arr[j + 1] = temp
+                                    }
+                                }
+                            }
+                            var temp = arr[j]
+                            arr[j] = arr[j + 1]
+                            arr[j + 1] = temp
+                        }
+                    }
+                }
+                return best
             }
-            console.log(best)
-            //search the rest of obj for same value as bestNum and then sort and distribute
-            //make thing into function then add a skipped list so that the pot can be emptied
+            bestPlayer()
+            //loop through bestPlayer and shiz and subtract from pot and shiz
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })
