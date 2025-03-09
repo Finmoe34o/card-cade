@@ -367,14 +367,22 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             let empty = false
             let index = 0
             const skipped = []
-            while (!empty && index < 6) {
-                const highest = best.order[index]
-                empty = true
-                for (let i = 0; i < 6; i++) {
-                    contributions[i] !== 0 ? empty = false : null
-                    i !== highest && contributions[highest] >= contributions[i] ? (stackSizes[highest] = stackSizes[highest] + contributions[i], stackSizes[i] = stackSizes[i] - contributions[i], contributions[highest] = contributions[highest] - contributions[i]) : i !== highest && contributions[highest] >= contributions[i] ? (stackSizes[highest] = stackSizes[highest] + contributions[highest], contributions[])
+            while (!empty && index < best.order.length) {
+                const highest = best.order[index];
+
+                let totalPot = contributions.reduce((sum, c) => sum + c, 0);
+
+                for (let i = 0; i < contributions.length; i++) {
+                    if (i !== parseInt(highest) && contributions[i] > 0) {
+                        let amount = Math.min(contributions[i], totalPot);
+                        stackSizes[highest] += amount;
+                        stackSizes[i] -= amount;
+                        contributions[i] -= amount;
+                    }
                 }
-                index++
+
+                empty = contributions.every(c => c <= 0);
+                index++;
             }
             console.log(contributions, stackSizes)
             //loop through bestPlayer and shiz and subtract from pot and shiz   
