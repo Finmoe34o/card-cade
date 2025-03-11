@@ -52,12 +52,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     const minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
     let contributions = serverObject.contributions
-    const updatedContributions = Object.keys(contributions).forEach(function (key, index) {
-        if (key === playerNum) {
-            return { ...key, playerNum: contributions[playerNum] + bet };
-        }
-        return key;
-    });
+    contributions[playerNum] = contributions[playerNum] + bet
     // get vars
 
     const cardCheck = (river, hand) => {
@@ -239,7 +234,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     let stackSizes = { ...serverObject.stack_sizes };
     const { data, error } = await supabase
         .from("servers")
-        .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers, contributions: updatedContributions })
+        .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers, "contributions": contributions })
         .eq('id', serverNum);
     if (bet === 0) {
 
@@ -257,7 +252,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({ "min_bet": bet })
             .eq("id", serverNum)
     }
-    if ((round === 1 && turn !== big_Blind) || (round > 1 && big_Blind > 2 && turn !== big_Blind - 2) || (round > 1 && big_Blind < 3 && turn !== 5 + big_Blind - 2)) {
+    if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && big_Blind > 2 && turn !== big_Blind - 2) || (round > 1 && big_Blind < 3 && turn !== 5 + big_Blind - 2)) {
         turn === 5 ? turn = 1 : turn++
         while (!activePlayers.includes(Number(turn)) && activePlayers.length > 0 && round > 1) {
             turn === 5 ? turn = 1 : turn++
@@ -269,13 +264,14 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     }
     else {
 
-        if (round === 1) {
+        if (round === Number(1)) {
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             round++
+            console.log(round)
+
         } else if (round < 4) {
             big_Blind > 2 ? turn = big_Blind - 2 : big_Blind = 5 + big_Blind - 2
             round++
-
         } else {
             round = 1
             big_Blind === 5 ? big_Blind = 1 : big_Blind
@@ -328,7 +324,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 // Sorting logic
                 for (var i = 0; i < arr.length; i++) {
                     for (var j = 0; j < arr.length - i - 1; j++) {
-                        if (arr[j][1] !== null && arr[j + 1][1] !== null) {
+                        if (arr[j][1] !== undefined && arr[j + 1][1] !== undefined) {
                             // Compare primary value (arr[j][1][0])
                             if (arr[j][1][0] < arr[j + 1][1][0]) {
                                 var temp = arr[j];
@@ -369,32 +365,36 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             const skipped = []
             while (!empty && index < best.order.length) {
                 const highest = best.order[index];
-
-                let totalPot = contributions.reduce((sum, c) => sum + c, 0);
-
+                let totalPot = 0
+                for (let i = 1; i < 6; i++) {
+                    totalPot = totalPot + contributions[i]
+                }
+                //let totalPot = contributions.reduce((sum, c) => sum + c, 0);
+                empty = true
                 for (let i = 0; i < contributions.length; i++) {
                     if (i !== parseInt(highest) && contributions[i] > 0) {
                         let amount = Math.min(contributions[i], totalPot);
                         stackSizes[highest] += amount;
                         stackSizes[i] -= amount;
                         contributions[i] -= amount;
+                        contributions[i] !== 0 ? empty = false : null
                     }
                 }
-
-                empty = contributions.every(c => c <= 0);
                 index++;
             }
             console.log(contributions, stackSizes)
             //loop through bestPlayer and shiz and subtract from pot and shiz   
+            roundRestart()
+            let t = big_Blind === 5 ? 1 : big_Blind + 1
             const { data, error } = await supabase
                 .from("servers")
-                .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })
-            roundRestart()
+                .update({ "round": 1, "turn": t, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
+                .eq("id", serverNum)
         }
-        let t = big_Blind === 5 ? t = 1 : t = big_Blind + 1
         const { data, error } = await supabase
             .from("servers")
-            .update({ "round": 1, "turn": t, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
+            .update({ "round": round, "turn": turn, big_blind: big_Blind, stack_sizes: stackSizes })
             .eq("id", serverNum)
     }
+
 }

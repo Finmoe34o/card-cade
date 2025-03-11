@@ -31,6 +31,7 @@ export default function page({serverObject, playerNum}) {
     //turn skipping on rounds after first and handling first turn after big blind 
     
     const foldFunct = async() => {
+        setBet(0)
         await sendValuesToServer(bet,serverObject,playerNum)
         router.refresh()
     }
@@ -43,7 +44,6 @@ export default function page({serverObject, playerNum}) {
     const raiseFunct = async () => {
         betSize < bet ? setBetSize(bet) : setBet(betSize)
         await sendValuesToServer(betSize,serverObject,playerNum)
-        setBetSize(-1)  
         router.refresh()
     }
 
@@ -120,6 +120,7 @@ export default function page({serverObject, playerNum}) {
     }
     return <>
          <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
+          <div className="text-white w-[5vw] absolute -top-[20vh] left-0">MB{serverObject.min_bet }{" "}T { serverObject.turn }{" "}R{ serverObject.round }{" "}BB {serverObject.big_blind}{" "}{ JSON.stringify(serverObject.stack_sizes)}{JSON.stringify(serverObject.contributions)}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
