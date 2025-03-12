@@ -49,9 +49,10 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     let round = Number(serverObject.round)
     let pot = Number(serverObject.pot)
     pot = pot + bet
-    const minBet = serverObject.min_bet
+    let minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
     let contributions = serverObject.contributions
+    minBet = minBet - contributions[playerNum]
     contributions[playerNum] = contributions[playerNum] + bet
     // get vars
 
@@ -252,6 +253,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({ "min_bet": bet })
             .eq("id", serverNum)
     }
+    for (let i = 0; i < activePlayers.length; i++) {
+
+    }
     if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && big_Blind > 2 && turn !== big_Blind - 2) || (round > 1 && big_Blind < 3 && turn !== 5 + big_Blind - 2)) {
         turn === 5 ? turn = 1 : turn++
         while (!activePlayers.includes(Number(turn)) && activePlayers.length > 0 && round > 1) {
@@ -274,7 +278,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             round++
         } else {
             round = 1
-            big_Blind === 5 ? big_Blind = 1 : big_Blind
+            big_Blind === 5 ? big_Blind = 1 : big_Blind++
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             const bestPlayer = async () => {
                 const obj = { "1": null, "2": null, "3": null, "4": null, "5": null }
@@ -369,26 +373,31 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 for (let i = 1; i < 6; i++) {
                     totalPot = totalPot + contributions[i]
                 }
-                //let totalPot = contributions.reduce((sum, c) => sum + c, 0);
                 empty = true
-                for (let i = 0; i < contributions.length; i++) {
-                    if (i !== parseInt(highest) && contributions[i] > 0) {
-                        let amount = Math.min(contributions[i], totalPot);
+                for (let i = 1; i < 6; i++) {
+                    if (i !== Number(highest) && contributions[i] > 0) {
+                        contributions[i] !== 0 ? empty = false : null
+                        let amount = contributions[highest]
+                        if (contributions[i] - amount < 0) {
+                            amount = contributions[i]
+                        }
                         stackSizes[highest] += amount;
                         stackSizes[i] -= amount;
                         contributions[i] -= amount;
-                        contributions[i] !== 0 ? empty = false : null
+                        contributions[highest] -= amount
                     }
                 }
                 index++;
             }
-            console.log(contributions, stackSizes)
             //loop through bestPlayer and shiz and subtract from pot and shiz   
             roundRestart()
             let t = big_Blind === 5 ? 1 : big_Blind + 1
+            contributions = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }
+            contributions[big_Blind] = 50
+            contributions[big_Blind - 1] = 25
             const { data, error } = await supabase
                 .from("servers")
-                .update({ "round": 1, "turn": t, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 } })
+                .update({ "round": 1, "turn": t, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": contributions })
                 .eq("id", serverNum)
         }
         const { data, error } = await supabase
