@@ -224,7 +224,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({
                 river: [],
                 player_cards: [],
-                active_players: [1, 2, 3, 4, 5],
+                active_players: [],
                 best_hand: [],
                 min_bet: 50
             })
@@ -253,6 +253,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             .update({ "min_bet": bet })
             .eq("id", serverNum)
     }
+
+    //test contributions and other shiz 
+
     for (let i = 0; i < activePlayers.length; i++) {
 
     }
@@ -277,6 +280,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             big_Blind > 2 ? turn = big_Blind - 2 : big_Blind = 5 + big_Blind - 2
             round++
         } else {
+            //check stuff works fix the raise bit - funkyness to the max each player is needed to readd to the same amount however the raiser puts in more  - when deciding when to end the round the active player arr should be used with 1,2,5 and bb 1 the round will never end passed the first.
+            console.log("contributions - ", contributions, "\n", "stacks - ", stackSizes)
             round = 1
             big_Blind === 5 ? big_Blind = 1 : big_Blind++
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
@@ -358,7 +363,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 const keyOrder = arr.map(item => item[0]);
 
                 const sortedBest = Object.fromEntries(arr);
-
+                console.log(keyOrder)
                 return { best: sortedBest, order: keyOrder };
 
 
@@ -394,7 +399,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             let t = big_Blind === 5 ? 1 : big_Blind + 1
             contributions = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }
             contributions[big_Blind] = 50
-            contributions[big_Blind - 1] = 25
+            big_Blind === 5 ? contributions[1] = 25 : contributions[big_Blind - 1] = 25
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": 1, "turn": t, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": contributions })
