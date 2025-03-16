@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server"
+import { cookies } from "next/headers"
 
 export async function sendValuesToServer(bet, serverObject, playerNum) {
     const comparison = async (set1) => {
@@ -225,7 +226,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                 river: [],
                 player_cards: [],
                 active_players: [],
-                best_hand: [],
                 min_bet: 50
             })
             .eq("id", serverNum)
@@ -280,7 +280,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             big_Blind > 2 ? turn = big_Blind - 2 : big_Blind = 5 + big_Blind - 2
             round++
         } else {
-            //check stuff works fix the raise bit - funkyness to the max each player is needed to readd to the same amount however the raiser puts in more  - when deciding when to end the round the active player arr should be used with 1,2,5 and bb 1 the round will never end passed the first.
+            //check stuff works fix the raise bit - funkyness to the max each player is needed to readd to the same amount however the raiser puts in more  - when deciding when to end the round the active player arr should be used with 1,2,5 and bb 1 the round will never end passed the first. also fix the ui for raising make it add and subtract buttons not a slider so {-} {amount} {+}
             console.log("contributions - ", contributions, "\n", "stacks - ", stackSizes)
             round = 1
             big_Blind === 5 ? big_Blind = 1 : big_Blind++
@@ -322,38 +322,39 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                     }
                 }
 
-                // Create an array of [key, value] pairs
                 const arr = Object.entries(best);
-
-                // Helper function to convert card faces to numeric values
                 const convertCard = (card) => {
                     return card === "J" ? 11 : card === "Q" ? 12 : card === "K" ? 13 : card === "A" ? 14 : parseInt(card);
                 };
-
-                // Sorting logic
+                console.log("s", arr)
                 for (var i = 0; i < arr.length; i++) {
                     for (var j = 0; j < arr.length - i - 1; j++) {
                         if (arr[j][1] !== undefined && arr[j + 1][1] !== undefined) {
-                            // Compare primary value (arr[j][1][0])
-                            if (arr[j][1][0] < arr[j + 1][1][0]) {
-                                var temp = arr[j];
-                                arr[j] = arr[j + 1];
-                                arr[j + 1] = temp;
-                            } else if (arr[j][1][0] === arr[j + 1][1][0]) {
-                                // If primary values are equal, compare card ranks
-                                let swapped = false;
-                                for (let k = 0; k < arr[j][1][1].length; k++) {
-                                    let card1 = convertCard(arr[j][1][1][k]);
-                                    let card2 = convertCard(arr[j + 1][1][1][k]);
-                                    if (card1 < card2) {
-                                        var temp = arr[j];
-                                        arr[j] = arr[j + 1];
-                                        arr[j + 1] = temp;
-                                        swapped = true;
-                                        break;
-                                    } else if (card1 > card2) {
-                                        break;
+                            if (arr[j][1] !== null && arr[j + 1][1] !== null) {
+                                if (arr[j][1][0] < arr[j + 1][1][0]) {
+                                    var temp = arr[j];
+                                    arr[j] = arr[j + 1];
+                                    arr[j + 1] = temp;
+                                } else if (arr[j][1][0] === arr[j + 1][1][0]) {
+                                    let swapped = false;
+                                    for (let k = 0; k < arr[j][1][1].length; k++) {
+                                        let card1 = convertCard(arr[j][1][1][k]);
+                                        let card2 = convertCard(arr[j + 1][1][1][k]);
+                                        if (card1 < card2) {
+                                            var temp = arr[j];
+                                            arr[j] = arr[j + 1];
+                                            arr[j + 1] = temp;
+                                            swapped = true;
+                                            break;
+                                        } else if (card1 > card2) {
+                                            break;
+                                        }
                                     }
+                                }
+                            } else {
+                                if (arr[j][1] === null) {
+                                    arr.splice(j, 1)
+                                    j--
                                 }
                             }
                         }
@@ -389,17 +390,17 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
                         stackSizes[highest] += amount;
                         stackSizes[i] -= amount;
                         contributions[i] -= amount;
-                        contributions[highest] -= amount
                     }
                 }
+                contributions[highest] -= contributions[highest]
+                //subtraction issue test
                 index++;
             }
-            //loop through bestPlayer and shiz and subtract from pot and shiz   
             roundRestart()
             let t = big_Blind === 5 ? 1 : big_Blind + 1
             contributions = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }
             contributions[big_Blind] = 50
-            big_Blind === 5 ? contributions[1] = 25 : contributions[big_Blind - 1] = 25
+            big_Blind === 1 ? contributions[5] = 25 : contributions[big_Blind - 1] = 25
             const { data, error } = await supabase
                 .from("servers")
                 .update({ "round": 1, "turn": t, "big_blind": big_Blind, "stack_sizes": stackSizes, "contributions": contributions })
@@ -412,3 +413,4 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     }
 
 }
+

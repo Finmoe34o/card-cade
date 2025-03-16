@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 
 export default function page({serverObject, playerNum}) {
     const [bet, setBet] = useState(0)
-    const [betSize, setBetSize] = useState(0)
     const [menuOpen, setMenuOpen] = useState(false)
     const [load, setLoad] = useState(false)
     const pNum = Number(playerNum)
@@ -44,8 +43,7 @@ export default function page({serverObject, playerNum}) {
     }
 
     const raiseFunct = async () => {
-        betSize < bet ? setBetSize(bet) : setBet(betSize)
-        await sendValuesToServer(betSize,serverObject,playerNum)
+        await sendValuesToServer(bet,serverObject,playerNum)
         router.refresh()
     }
 
@@ -115,55 +113,54 @@ export default function page({serverObject, playerNum}) {
         }
         return cardFunct(suit, card); 
       }
-
-
-    const dragFunct = (e) => {
-        mouseDown && e.clientY - 385 > 28 ? (setMouseY(e.clientY - 385), setBetSize((Math.floor((216 - mouseY) / 1.88) / 100) * stackSize)) : mouseDown && e.clientY - 385 <= 28 ? (setMouseY(28), setBetSize(stackSize)) : ""
-    }
+      let counter = 0
     return <>
       <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
           <div className="text-white w-[5vw] absolute -top-[20vh] left-0">MB{serverObject.min_bet }{" "}T { serverObject.turn }{" "}R{ serverObject.round }{" "}BB {serverObject.big_blind}{" "}{ JSON.stringify(serverObject.stack_sizes)}{JSON.stringify(serverObject.contributions)}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
-          <div className="text-white absolute text-center mx-auto w-[120px] top-[20vh]">{stackSize}</div>
-          <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-400 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
+          <div className="text-white absolute text-center mx-auto w-[120px] top-[20vh]">{stackSize - contributions[pNum]}</div>
+          <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-400" : "border-[1px]"} bg-gray-600 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className={`bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold absolute left-[53vw] top-[17vh] ${serverObject.big_blind === Number(playerNum) ? "block": "hidden"}`}>BB</div>
           <div className=" text-white absolute top-[29vh] left-[25vw] w-[50vw] h-[20vw]">
               <div className="flex absolute justify-between w-[50vw] h-[20vh]">
               <button onClick={turn === pNum ? foldFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Fold</button>
-              <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{Number(bet) === Number(minBet) ? "check" : "call"}</button>
-              <button onClick={() => {betSize !== 0 ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Raise</button>
-              <div className={`bg-gray-600 absolute left-[37.5vw] w-[10vw] rounded-t-2xl ${menuOpen ? "h-[30vh] -top-[30vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
-                <button id="dragButton" onMouseDown={() => {setMouseDown(true)}} onMouseUp={() => {setMouseDown(false)}}  onMouseMove={dragFunct} className={`h-[100%] absolute left-[50%] flex flex-col justify-evenly w-[50%] ${menuOpen ? "block" : "hidden"}`}>
-                  <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
-                  <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
-                  <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
-                  <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
-                  <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
-                  <div className="w-[80%] mx-auto h-[3px] rounded-3xl bg-black"></div>
-                  <div style={mouseY !== 0 ? mouseY > 0 ? {top: mouseY } : {top: "0"} : {bottom: 0, opacity: 0}} className="absolute bottom-0 w-[100%] mx-auto h-[3px] rounded-3xl bg-red-500"></div>
-                </button>
-              </div> 
+              <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{minBet === 0 ? "check" : "call"}</button>
+              <button onClick={() => {bet !== 0 /* only executes when a raise occurs */ ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl z-30">Raise</button>
+              <div className={`bg-gray-600 absolute left-[36vw] w-[13vw] rounded-t-2xl ${menuOpen ? "h-[10vh] -top-[10vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
+                <div className="flex mx-auto justify-evenly flex-nowrap flex-row">
+                  <button onClick={() => {bet > minBet + 50  ? setBet(bet - 50) : setBet(minBet + 50)}} className={`relative pb-3 top-[5vh] rounded-lg border-2  w-[4vw] h-[4vh] border-gray-700 bg-gray-500 ${menuOpen ? "block" : "hidden"}`}>
+                    -50
+                  </button>
+                  <button className={`relative pb-2 top-[5vh] rounded-lg border-2  w-[4vw] border-gray-700 bg-gray-500 transition-opacity ease-out duration-75 delay-50 ${menuOpen ? " h-[4vh] opacity-100 z-20" : load ? "h-0 top-0 opacity-0" : "opacity-0 h-0 top-0"}`}>
+                    {bet > Number(minBet) + 50 ? bet : minBet  +50}
+                  </button>
+                  <button onClick={() => {counter++, stackSize > contributions[pNum] + 50 ? setBet(bet + 50) : setBet(stackSize - contributions[pNum])}} className={`relative pb-3 top-[5vh] rounded-lg border-2  w-[4vw] h-[4vh] border-gray-700 bg-gray-500 ${menuOpen ? "block" : "hidden"}`}>
+                    +50
+                    <div className="absolute top-0 left-0">s</div>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div className="w-[100vw] h-[100vh]">
         <div className=" absolute left-[15vw] top-[65vh]">
-          <div className={`${numOfPlayers >= 2 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 2 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 5 ? serverObject.big_blind === pNum + 1 ? "block": "hidden": serverObject.big_blind === pNum - 4? "block": "hidden" }`}>BB</div>
         </div>
         <div className="absolute left-[15vw] top-[9vh]">
-          <div className={`${numOfPlayers >= 3 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 3 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 4 ? serverObject.big_blind === pNum + 2 ? "block": "hidden": serverObject.big_blind === pNum - 3? "block": "hidden" }`}>BB</div>
         </div>
         <div className="absolute right-[15vw] top-[9vh]">
-          <div className={`${numOfPlayers >= 4 ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 4 ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 3 ? serverObject.big_blind === pNum + 3 ? "block": "hidden": serverObject.big_blind === pNum - 2? "block": "hidden" }`}>BB</div>
         </div>
         <div className="absolute right-[15vw] top-[65vh]">
-          <div className={`${numOfPlayers >= 5 ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 5 ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 2 ? serverObject.big_blind === pNum + 4 ? "block": "hidden": serverObject.big_blind === pNum - 1? "block": "hidden" }`}>BB</div>
         </div>
       </div>

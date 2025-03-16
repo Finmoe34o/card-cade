@@ -80,13 +80,13 @@ const config = {
             top: "0",
           },
           "100%" : {
-            height: "30vh",
-            top: "-30vh"
+            height: "15vh",
+            top: "-15vh"
           }
         }, comeDown: {
           "0%" : {
-            height: "30vh",
-            top: "-30vh",
+            height: "15vh",
+            top: "-15vh",
           },
           "100%" : {
             height: "0",
@@ -98,8 +98,8 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "loading-bar": "loading-bar 10s linear",
-        "comeDown": "comeDown 0.4s ease-out",
-        "comeUp": "comeUp 0.6s ease-in"
+        "comeDown": "comeDown 0.15s ease-out",
+        "comeUp": "comeUp 0.2s ease-in"
       },
     },
   },
