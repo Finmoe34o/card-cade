@@ -10,10 +10,9 @@ export default function page({serverObject, playerNum}) {
     const [load, setLoad] = useState(false)
     const pNum = Number(playerNum)
     const router = useRouter();
-    
     //declaring db Vars
-    let round = serverObject.round
-    let turn = serverObject.turn
+    let round = Number(serverObject.round)
+    let turn = Number(serverObject.turn)
     let stackSize = serverObject.stack_sizes[playerNum]
     const player_cards = serverObject.player_cards
     let minBet = serverObject.min_bet
@@ -24,8 +23,25 @@ export default function page({serverObject, playerNum}) {
     const bigBlind = Number(serverObject.big_blind)
     bigBlind === playerNum ? setBet(50) : bigBlind - 1 === playerNum ? setBet(25) : null
 
+    //////use js cookkies in client side idiot
+    
+    useEffect(() => {
+      localStorage.setItem("stackSize",10000)
+      console.log(localStorage.getItem("stackSize"))
+    },[])
 
     useEffect(() => {
+      if (stackSize === undefined || stackSize === null) {
+        if (isNaN(document.localStorage.getItem("stackSize"))) { 
+          document.localStorage.setItem("stackSize", 10000)
+          stackSize = 10000
+        } else {
+          stackSize = document.localStorage.getItem("stackSize")
+        }
+      }
+      if((bigBlind === 5 && turn === 1 && round === 5) || (turn === bigBlind + 1 && round === 1)) { 
+        localStorage.setItem("stackSize",stackSize)
+      }
       router.refresh()
     }, [serverObject.turn])
 

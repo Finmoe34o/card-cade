@@ -2,9 +2,6 @@ import Link from "next/link"
 import { createClient } from '@/utils/supabase/server';
 import { headers } from "next/headers";
 import ActionButtons from "../../../components/actionButtons"
-import {cookieSet} from "../../actions"
-import { cookies } from "next/headers";
-
 
 export default async function page() {
     const headerList = await headers()
@@ -28,16 +25,8 @@ export default async function page() {
                 .update({ "big_Blind": 1 })
                 .eq('id', serverNum)
     }
-    let stackSize = servers[serverNum - 1][playerNum]
-    if (stackSize === undefined || stackSize === null) {
-      let stackSize
-    const cookieStore = await cookies()
-    const hasCookie = cookieStore.has("stackSize")
-    if (!hasCookie) {
-        cookieSet()
-    }
-    stackSize = cookieStore.get("stackSize")
-    }
+    let stackSize = servers[serverNum - 1][playerNum];
+
     
 
     if (round === null && activePlayers >= 2) {
