@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server"
 
-export async function sendValuesToServer(bet, serverObject, playerNum) {
+export async function sendValuesToServer(bet, serverObject, playerNum, pStackSize) {
     const comparison = async (set1) => {
         if (set1[0] === "high") {
             isNaN(set1[1][0]) ? set1[1][0] === "J" ? set1[1][0] = 11 : set1[1][0] === "Q" ? set1[1][0] = 12 : set1[1][0] === "K" ? set1[1][0] = 13 : set1[1][0] === "A" ? set1[1][0] = 14 : isNaN(set1[1][1]) ? set1[1][1] === "J" ? set1[1][1] = 11 : set1[1][1] === "Q" ? set1[1][1] = 12 : set1[1][1] === "K" ? set1[1][1] = 13 : set1[1][1] === "A" ? set1[1][1] = 14 : null : null : null
@@ -41,7 +41,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
             return "ERROR"
         }
     }
-
+    console.log("p", pStackSize)
     const supabase = await createClient()
     const serverNum = serverObject.id
     const playerArr = serverObject.active_players
@@ -232,6 +232,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum) {
     let big_Blind = Number(serverObject.big_blind)
     bet >= minBet && round === 1 ? activePlayers.push(playerNum) : null
     let stackSizes = { ...serverObject.stack_sizes };
+    stackSizes[playerNum] = pStackSize
     const { data, error } = await supabase
         .from("servers")
         .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers, "contributions": contributions })

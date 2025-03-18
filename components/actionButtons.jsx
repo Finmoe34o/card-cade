@@ -13,7 +13,8 @@ export default function page({serverObject, playerNum}) {
     //declaring db Vars
     let round = Number(serverObject.round)
     let turn = Number(serverObject.turn)
-    let stackSize = serverObject.stack_sizes[playerNum]
+    let stackSizeDB = serverObject.stack_sizes[playerNum]
+    const [stackSize, setStackSize] = useState(Number(stackSizeDB))
     const player_cards = serverObject.player_cards
     let minBet = serverObject.min_bet
     const contributions = serverObject.contributions
@@ -24,42 +25,36 @@ export default function page({serverObject, playerNum}) {
     bigBlind === playerNum ? setBet(50) : bigBlind - 1 === playerNum ? setBet(25) : null
 
     //////use js cookkies in client side idiot
-    
-    useEffect(() => {
-      localStorage.setItem("stackSize",10000)
-      console.log(localStorage.getItem("stackSize"))
-    },[])
 
     useEffect(() => {
       if (stackSize === undefined || stackSize === null) {
-        if (isNaN(document.localStorage.getItem("stackSize"))) { 
-          document.localStorage.setItem("stackSize", 10000)
-          stackSize = 10000
-        } else {
-          stackSize = document.localStorage.getItem("stackSize")
-        }
+          if (localStorage.getItem("stackSize") === null) {
+            localStorage.setItem("stackSize", "10000")
+          }
+          console.log(localStorage.getItem("stackSize"))
+          setStackSize(Number(localStorage.getItem("stackSize")))
       }
+      console.log(stackSize)
       if((bigBlind === 5 && turn === 1 && round === 5) || (turn === bigBlind + 1 && round === 1)) { 
-        localStorage.setItem("stackSize",stackSize)
+        localStorage.setItem("stackSize",`${stackSize}`)
       }
       router.refresh()
     }, [serverObject.turn])
-
     //turn skipping on rounds after first and handling first turn after big blind 
     
     const foldFunct = async() => {
         setBet(0)
-        await sendValuesToServer(bet,serverObject,playerNum)
+        await sendValuesToServer(bet,serverObject,playerNum,stackSize)
         router.refresh()
     }
 
     const checkCallFunct = async () => {
-        await sendValuesToServer(minBet,serverObject,playerNum);
+        await sendValuesToServer(minBet,serverObject,playerNum,stackSize);
         window.location.reload()
     }
 
     const raiseFunct = async () => {
-        await sendValuesToServer(bet,serverObject,playerNum)
+        await sendValuesToServer(bet,serverObject,playerNum,stackSize)
         router.refresh()
     }
 
