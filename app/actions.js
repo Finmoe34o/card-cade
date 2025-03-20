@@ -237,7 +237,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
         .from("servers")
         .update({ "stack_sizes": stackSizes, pot, pot, active_players: activePlayers, "contributions": contributions })
         .eq('id', serverNum);
-    if (bet === 0) {
+    if (bet === 0 && contributions[playerNum] !== minBet) {
 
         const newArr = []
         for (let i = 0; i < playerArr.length; i++) {
@@ -254,12 +254,19 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
             .eq("id", serverNum)
     }
 
-    //test contributions and other shiz 
 
-    for (let i = 0; i < activePlayers.length; i++) {
-
+    let last
+    for (let i = 0; i < 5; i++) {
+        let blob = big_Blind - (2 + i);
+        blob < 1 ? last = 5 + blob : last = blob
+        last === 0 ? last = 5 : null
+        if (activePlayers.includes(last)) {
+            break
+        }
     }
-    if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && big_Blind > 2 && turn !== big_Blind - 2) || (round > 1 && big_Blind < 3 && turn !== 5 + big_Blind - 2)) {
+
+
+    if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && last)) {
         turn === 5 ? turn = 1 : turn++
         while (!activePlayers.includes(Number(turn)) && activePlayers.length > 0 && round > 1) {
             turn === 5 ? turn = 1 : turn++
