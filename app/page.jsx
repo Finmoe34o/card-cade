@@ -26,7 +26,8 @@ export default async function page() {
     }
 
     const iteratePlayerNum = async (playerNum,serverNum) => {
-        
+        playerNum++
+        console.log(playerNum)
         const { data, error } = await supabase
             .from('servers')
             .update({ "players": playerNum })
@@ -48,7 +49,7 @@ export default async function page() {
             newServer(servers.length + 1)
             serverNum = servers.length + 1
         }
-        //iteratePlayerNum(playerNum,serverNum)
+        await iteratePlayerNum(playerNum,serverNum)
         if (servers[serverNum - 1].players === 1) {
             const { data, error } = await supabase
                 .from('servers')
@@ -62,6 +63,7 @@ export default async function page() {
                 ])
                 .eq("id", serverNum)
         }
+        console.log(serverNum ,"/", playerNum )
         return `/${serverNum}/${playerNum}`
     }
  
@@ -72,6 +74,6 @@ export default async function page() {
             </Link>
         </nav>
         <h2 className="text-3xl font-semibold text-gray-200 relative top-[18.5vh]">Play Poker now</h2>
-        <a href={findServer()} className="w-[15vw] h-[5vh] relative block py-1 top-[38vh] bg-gray-600 rounded-2xl mx-auto">Find a table</a>
+        <a href={await findServer()} className="w-[15vw] h-[5vh] relative block py-1 top-[38vh] bg-gray-600 rounded-2xl mx-auto">Find a table</a>
     </div>
 }

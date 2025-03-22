@@ -41,7 +41,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
             return "ERROR"
         }
     }
-    console.log("p", pStackSize)
     const supabase = await createClient()
     const serverNum = serverObject.id
     const playerArr = serverObject.active_players
@@ -55,6 +54,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
     minBet = minBet - contributions[playerNum]
     contributions[playerNum] = contributions[playerNum] + bet
     // get vars
+
 
     const cardCheck = (river, hand) => {
         let handType = "high"
@@ -250,7 +250,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
     } if (bet > serverObject.min_bet) {
         const { data, error } = await supabase
             .from("servers")
-            .update({ "min_bet": bet })
+            .update({ "min_bet": contributions[playerNum] })
             .eq("id", serverNum)
     }
 

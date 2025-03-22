@@ -16,9 +16,8 @@ export default function page({serverObject, playerNum}) {
     let stackSizeDB = serverObject.stack_sizes[playerNum]
     const [stackSize, setStackSize] = useState(Number(stackSizeDB))
     const player_cards = serverObject.player_cards
-    let minBet = serverObject.min_bet
-    const contributions = serverObject.contributions
-    minBet = minBet - contributions[playerNum]
+    const contributions = Number(serverObject.contributions[playerNum])
+    let minBet = serverObject.min_bet - contributions
     const numOfPlayers = serverObject.players
     const river = serverObject.river
     const bigBlind = Number(serverObject.big_blind)
@@ -31,6 +30,7 @@ export default function page({serverObject, playerNum}) {
           if (localStorage.getItem("stackSize") === null) {
             localStorage.setItem("stackSize", "10000")
           }
+          setStackSize(10000)
           console.log(localStorage.getItem("stackSize"))
           setStackSize(Number(localStorage.getItem("stackSize")))
       }
@@ -49,8 +49,9 @@ export default function page({serverObject, playerNum}) {
     }
 
     const checkCallFunct = async () => {
-        await sendValuesToServer(minBet,serverObject,playerNum,stackSize);
-        window.location.reload()
+        contributions - minBet < 0 ? setBet(stackSize - contributions) : setBet(minBet) 
+        await sendValuesToServer(bet,serverObject,playerNum,stackSize);
+        router.refresh()
     }
 
     const raiseFunct = async () => {
@@ -124,32 +125,32 @@ export default function page({serverObject, playerNum}) {
         }
         return cardFunct(suit, card); 
       }
-      let counter = 0
     return <>
+    <button onClick={turn === pNum ? foldFunct : null} className="w-[10vw] h-[7.5vh] relative left-[1vw] top-[1vh] bg-[#616161] bg-opacity-90 rounded-2xl">Fold</button>
       <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
           <div className="text-white w-[5vw] absolute -top-[20vh] left-0">MB{serverObject.min_bet }{" "}T { serverObject.turn }{" "}R{ serverObject.round }{" "}BB {serverObject.big_blind}{" "}{ JSON.stringify(serverObject.stack_sizes)}{JSON.stringify(serverObject.contributions)}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
-          <div className="text-white absolute text-center mx-auto w-[120px] top-[20vh]">{stackSize - contributions[pNum]}</div>
+          <div className="text-white absolute text-center mx-auto w-[120px] top-[20vh]">{stackSize - Number(contributions)}</div>
           <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-400" : "border-[1px]"} bg-gray-600 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className={`bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold absolute left-[53vw] top-[17vh] ${serverObject.big_blind === Number(playerNum) ? "block": "hidden"}`}>BB</div>
-          <div className=" text-white absolute top-[29vh] left-[25vw] w-[50vw] h-[20vw]">
+          <div className=" text-black absolute top-[29vh] left-[25vw] w-[50vw] h-[20vw]">
               <div className="flex absolute justify-between w-[50vw] h-[20vh]">
-              <button onClick={turn === pNum ? foldFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">Fold</button>
-              <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl">{minBet === 0 ? "check" : "call"}</button>
-              <button onClick={() => {bet !== 0 /* only executes when a raise occurs */ ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] h-[10vh] bg-gray-700 rounded-2xl z-30">Raise</button>
-              <div className={`bg-gray-600 absolute left-[36vw] w-[13vw] rounded-t-2xl ${menuOpen ? "h-[10vh] -top-[10vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
+              <button onClick={turn === pNum ? foldFunct : null} className="w-[15vw] h-[10vh] bg-[#D32F2F] bg-opacity-70 rounded-2xl">Fold</button>
+              <button onClick={turn === pNum ? checkCallFunct : null} className="w-[15vw] h-[10vh] bg-[#388E3C] bg-opacity-70 rounded-2xl">{minBet === 0 ? "check" : "call"}</button>
+              <button onClick={() => {bet !== 0 /* only executes when a raise occurs */ ? (raiseFunct(), setMenuOpen(false)) : turn === pNum ? (setMenuOpen(!menuOpen) , !load ? setLoad(true) : null) : null}} className="w-[15vw] bg-opacity-70 h-[10vh] bg-[#1976D2] rounded-2xl z-30">Raise</button>
+              <div className={`bg-blue-400 absolute left-[36vw] w-[13vw] rounded-t-2xl ${menuOpen ? "h-[10vh] -top-[10vh] opacity-100 z-20 animate-comeUp" : load ? "h-0 top-0 animate-comeDown" : "h-0 top-0" }`}>
                 <div className="flex mx-auto justify-evenly flex-nowrap flex-row">
                   <button onClick={() => {bet > minBet + 50  ? setBet(bet - 50) : setBet(minBet + 50)}} className={`relative pb-3 top-[5vh] rounded-lg border-2  w-[4vw] h-[4vh] border-gray-700 bg-gray-500 ${menuOpen ? "block" : "hidden"}`}>
                     -50
                   </button>
-                  <button className={`relative pb-2 top-[5vh] rounded-lg border-2  w-[4vw] border-gray-700 bg-gray-500 transition-opacity ease-out duration-75 delay-50 ${menuOpen ? " h-[4vh] opacity-100 z-20" : load ? "h-0 top-0 opacity-0" : "opacity-0 h-0 top-0"}`}>
+                  <button className={`relative pb-2 top-[5vh] rounded-lg border-2 border-gray-800  w-[4vw] transition-opacity ease-out duration-75 delay-50 ${menuOpen ? " h-[4vh] opacity-100 z-20" : load ? "h-0 top-0 opacity-0" : "opacity-0 h-0 top-0"}`}>
                     {bet > Number(minBet) + 50 ? bet : minBet  +50}
                   </button>
-                  <button onClick={() => {counter++, stackSize > contributions[pNum] + 50 ? setBet(bet + 50) : setBet(stackSize - contributions[pNum])}} className={`relative pb-3 top-[5vh] rounded-lg border-2  w-[4vw] h-[4vh] border-gray-700 bg-gray-500 ${menuOpen ? "block" : "hidden"}`}>
+                  <button onClick={() => {stackSize > contributions + 50 + bet ? setBet(bet + 50) : setBet(stackSize - contributions)}} className={`relative pb-3 top-[5vh] rounded-lg border-2  w-[4vw] h-[4vh] border-gray-700 bg-gray-500 ${menuOpen ? "block" : "hidden"}`}>
                     +50
-                    <div className="absolute top-0 left-0">s</div>
+                    <div className="absolute -top-96 left-0">{}</div>
                   </button>
                 </div>
               </div>
