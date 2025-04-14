@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server"
 
 export async function sendValuesToServer(bet, serverObject, playerNum, pStackSize) {
+    //assigns each hand a certain value based on cardCheck funct
     const comparison = async (set1) => {
         if (set1[0] === "high") {
             isNaN(set1[1][0]) ? set1[1][0] === "J" ? set1[1][0] = 11 : set1[1][0] === "Q" ? set1[1][0] = 12 : set1[1][0] === "K" ? set1[1][0] = 13 : set1[1][0] === "A" ? set1[1][0] = 14 : isNaN(set1[1][1]) ? set1[1][1] === "J" ? set1[1][1] = 11 : set1[1][1] === "Q" ? set1[1][1] = 12 : set1[1][1] === "K" ? set1[1][1] = 13 : set1[1][1] === "A" ? set1[1][1] = 14 : null : null : null
@@ -43,10 +44,20 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
     }
     const supabase = await createClient()
     const serverNum = serverObject.id
-    const playerArr = serverObject.active_players
+    const playerArr = serverObject.players
     let turn = Number(serverObject.turn)
     let round = Number(serverObject.round)
     let pot = Number(serverObject.pot)
+
+    if (bet === "leave") {
+        const index = playerArr.indexOf(playerNum)
+        playerArr.splice(index, 1)
+        await supabase
+            .from("servers")
+            .update({ players: playerArr })
+            .eq("id", serverNum)
+    }
+
     pot = pot + bet
     let minBet = serverObject.min_bet
     const activePlayers = serverObject.active_players
@@ -240,8 +251,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
     if (bet === 0 && contributions[playerNum] !== minBet) {
 
         const newArr = []
-        for (let i = 0; i < playerArr.length; i++) {
-            playerArr[i] !== playerNum ? newArr.push(playerArr[i]) : ""
+        for (let i = 0; i < activePlayers.length; i++) {
+            activePlayers[i] !== playerNum ? newArr.push(activePlayers[i]) : ""
         }
         const { data, error } = await supabase
             .from('servers')
@@ -265,10 +276,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
         }
     }
 
-
     if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && last)) {
         turn === 5 ? turn = 1 : turn++
-        while (!activePlayers.includes(Number(turn)) && activePlayers.length > 0 && round > 1) {
+        while (!activePlayers.includes(Number(turn)) && !playerArr.includes(Number(turn)) && activePlayers.length > 0 && round > 1) {
             turn === 5 ? turn = 1 : turn++
         }
         const { data, error } = await supabase
@@ -281,17 +291,18 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
         if (round === Number(1)) {
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             round++
-            console.log(round)
 
         } else if (round < 4) {
             big_Blind > 2 ? turn = big_Blind - 2 : big_Blind = 5 + big_Blind - 2
             round++
         } else {
-            //check stuff works fix the raise bit - funkyness to the max each player is needed to readd to the same amount however the raiser puts in more  - when deciding when to end the round the active player arr should be used with 1,2,5 and bb 1 the round will never end passed the first. also fix the ui for raising make it add and subtract buttons not a slider so {-} {amount} {+}
-            console.log("contributions - ", contributions, "\n", "stacks - ", stackSizes)
             round = 1
             big_Blind === 5 ? big_Blind = 1 : big_Blind++
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
+            while (!playerArr.includes(Number(big_Blind))) {
+                big_Blind === 5 ? big_Blind = 1 : big_Blind++
+                big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
+            }
             const bestPlayer = async () => {
                 const obj = { "1": null, "2": null, "3": null, "4": null, "5": null }
                 const river = serverObject.river
@@ -333,7 +344,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
                 const convertCard = (card) => {
                     return card === "J" ? 11 : card === "Q" ? 12 : card === "K" ? 13 : card === "A" ? 14 : parseInt(card);
                 };
-                console.log("s", arr)
                 for (var i = 0; i < arr.length; i++) {
                     for (var j = 0; j < arr.length - i - 1; j++) {
                         if (arr[j][1] !== undefined && arr[j + 1][1] !== undefined) {
@@ -371,7 +381,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
                 const keyOrder = arr.map(item => item[0]);
 
                 const sortedBest = Object.fromEntries(arr);
-                console.log(keyOrder)
                 return { best: sortedBest, order: keyOrder };
 
 
@@ -400,7 +409,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
                     }
                 }
                 contributions[highest] -= contributions[highest]
-                //subtraction issue test
                 index++;
             }
             roundRestart()
@@ -421,3 +429,66 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
 
 }
 
+const supabase = await createClient();
+let { data: servers } = await supabase.from('servers').select("*");
+
+const newServer = async (newServer) => {
+    const { error } = await supabase
+        .from('servers')
+        .insert([
+            {
+                players: [1],
+                river: '{}',
+                player_cards: '{}',
+                stack_sizes: { 1: null, 2: null, 3: null, 4: null, 5: null }
+            },
+        ])
+        .eq("id", newServer);
+
+    if (error) console.error("Error inserting server:", error);
+};
+
+const iteratePlayerNum = async (playerNum, serverNum) => {
+    const playerArr = await servers[serverNum - 1].players
+    playerArr.push(playerNum)
+    await supabase
+        .from('servers')
+        .update({ players: playerArr })
+        .eq("id", serverNum);
+};
+
+export const findServer = async () => {
+    let serverNum, playerNum;
+    for (let i = 0; i < servers.length; i++) {
+        if (servers[i].players.length < 5) {
+            serverNum = servers[i].id;
+            for (let i = 1; i < 6; i++) {
+                if (!servers[serverNum - 1].players.includes(i)) {
+                    playerNum = i
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if (serverNum === undefined) {
+        await newServer(servers.length + 1);
+        serverNum = servers.length + 1;
+    }
+    iteratePlayerNum(playerNum, serverNum);
+    if (servers[serverNum - 1].players === 1) {
+        await supabase
+            .from('servers')
+            .update([
+                {
+                    players: 1,
+                    river: '{}',
+                    player_cards: '{}',
+                    stack_sizes: '{}'
+                },
+            ])
+            .eq("id", serverNum);
+    }
+
+    return `/${serverNum}/${playerNum}`;
+};

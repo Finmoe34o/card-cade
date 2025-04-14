@@ -10,7 +10,6 @@ export default function page({serverObject, playerNum}) {
     const [load, setLoad] = useState(false)
     const pNum = Number(playerNum)
     const router = useRouter();
-    //declaring db Vars
     let round = Number(serverObject.round)
     let turn = Number(serverObject.turn)
     let stackSizeDB = serverObject.stack_sizes[playerNum]
@@ -23,18 +22,17 @@ export default function page({serverObject, playerNum}) {
     const bigBlind = Number(serverObject.big_blind)
     bigBlind === playerNum ? setBet(50) : bigBlind - 1 === playerNum ? setBet(25) : null
 
-    //////use js cookkies in client side idiot
+    
 
     useEffect(() => {
-      if (stackSize === undefined || stackSize === null) {
-          if (localStorage.getItem("stackSize") === null) {
+      console.log(JSON.stringify(stackSize) === `null`, JSON.stringify(stackSize))
+      if (stackSize === undefined || stackSize === null || JSON.stringify(stackSize) === `null`) {
+          if (localStorage.getItem("stackSize") === null || Number(localStorage.getItem("stackSize")) <= 0) {
             localStorage.setItem("stackSize", "10000")
           }
           setStackSize(10000)
-          console.log(localStorage.getItem("stackSize"))
           setStackSize(Number(localStorage.getItem("stackSize")))
       }
-      console.log(stackSize)
       if((bigBlind === 5 && turn === 1 && round === 5) || (turn === bigBlind + 1 && round === 1)) { 
         localStorage.setItem("stackSize",`${stackSize}`)
       }
@@ -59,8 +57,14 @@ export default function page({serverObject, playerNum}) {
         router.refresh()
     }
 
-    const [mouseY, setMouseY] = useState(0)
-    const [mouseDown, setMouseDown] = useState(false)
+    const leaveFunct = async () => {
+      await sendValuesToServer("leave",serverObject,playerNum)
+      setTimeout(() => router.push("/"), 100);
+    }
+
+    /*if (stackSize === 0) {
+      leaveFunct()
+    }*/
 
     const cardFunct = (suit, num) => {
         const spade = () => {
@@ -125,14 +129,15 @@ export default function page({serverObject, playerNum}) {
         }
         return cardFunct(suit, card); 
       }
+    const currentStack = stackSize - contributions
     return <>
-    <button onClick={turn === pNum ? foldFunct : null} className="w-[10vw] h-[7.5vh] relative left-[1vw] top-[1vh] bg-[#616161] bg-opacity-90 rounded-2xl">Fold</button>
+    <button onClick={leaveFunct} className="w-[10vw] h-[7.5vh] relative left-[1vw] top-[1vh] bg-[#616161] bg-opacity-90 rounded-2xl">Leave</button>
       <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
           <div className="text-white w-[5vw] absolute -top-[20vh] left-0">MB{serverObject.min_bet }{" "}T { serverObject.turn }{" "}R{ serverObject.round }{" "}BB {serverObject.big_blind}{" "}{ JSON.stringify(serverObject.stack_sizes)}{JSON.stringify(serverObject.contributions)}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
-          <div className="text-white absolute text-center mx-auto w-[120px] top-[20vh]">{stackSize - Number(contributions)}</div>
+          <div className="text-white absolute text-center mx-auto w-[120px] top-[20vh]">{`${currentStack}`}</div>
           <div className={`${Number(playerNum) === turn ? "border-[6px] animate-pulse border-green-400" : "border-[1px]"} bg-gray-600 relative -left-[40px] -top-[290px] z-0 flex flex-col w-[200px] h-[200px] rounded-full border-[1px] border-white`}></div>
           <div className={`bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold absolute left-[53vw] top-[17vh] ${serverObject.big_blind === Number(playerNum) ? "block": "hidden"}`}>BB</div>
           <div className=" text-black absolute top-[29vh] left-[25vw] w-[50vw] h-[20vw]">
