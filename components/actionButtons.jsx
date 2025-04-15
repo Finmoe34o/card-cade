@@ -1,15 +1,16 @@
 "use client"
 
-import {useState, useEffect} from "react"
+import {useEffect, useState} from "react"
 import { sendValuesToServer } from "../app/actions";
 import { useRouter } from 'next/navigation';
+import cardFunct from "./cardFunct"
 
 export default function page({serverObject, playerNum}) {
     const [bet, setBet] = useState(0)
     const [menuOpen, setMenuOpen] = useState(false)
     const [load, setLoad] = useState(false)
-    const pNum = Number(playerNum)
     const router = useRouter();
+    const pNum = Number(playerNum)
     let round = Number(serverObject.round)
     let turn = Number(serverObject.turn)
     let stackSizeDB = serverObject.stack_sizes[playerNum]
@@ -21,23 +22,14 @@ export default function page({serverObject, playerNum}) {
     const river = serverObject.river
     const bigBlind = Number(serverObject.big_blind)
     bigBlind === playerNum ? setBet(50) : bigBlind - 1 === playerNum ? setBet(25) : null
-
-    
+    const currentStack = stackSize - contributions
 
     useEffect(() => {
-      console.log(JSON.stringify(stackSize) === `null`, JSON.stringify(stackSize))
-      if (stackSize === undefined || stackSize === null || JSON.stringify(stackSize) === `null`) {
-          if (localStorage.getItem("stackSize") === null || Number(localStorage.getItem("stackSize")) <= 0) {
-            localStorage.setItem("stackSize", "10000")
-          }
-          setStackSize(10000)
-          setStackSize(Number(localStorage.getItem("stackSize")))
-      }
-      if((bigBlind === 5 && turn === 1 && round === 5) || (turn === bigBlind + 1 && round === 1)) { 
-        localStorage.setItem("stackSize",`${stackSize}`)
-      }
       router.refresh()
-    }, [serverObject.turn])
+    },[serverObject])
+
+
+
     //turn skipping on rounds after first and handling first turn after big blind 
     
     const foldFunct = async() => {
@@ -62,59 +54,11 @@ export default function page({serverObject, playerNum}) {
       setTimeout(() => router.push("/"), 100);
     }
 
-    /*if (stackSize === 0) {
+    if (stackSize === 0) {
       leaveFunct()
-    }*/
+    }
 
-    const cardFunct = (suit, num) => {
-        const spade = () => {
-          return <>
-            <div className="circle one"></div>
-            <div className="circle two"></div>
-            <div className="diag spade-left"></div>
-            <div className="diag spade-right"></div>
-            <div className="spade-block"></div>
-            <div className="spade-stem"></div>
-          </>
-        }
     
-        const hearts = () => {
-          return <>
-            <div className="heart-circle heart-one"></div>
-            <div className="heart-circle heart-two"></div>
-            <div className="heartDiag heartLeft"></div>
-            <div className={`heartDiag heartRight`}></div>
-            <div className="heart-block"></div>
-          </>
-        }
-    
-        const diamonds = () => {
-          return <>
-            <div className="rhombus"></div>
-            <div className="out-take diamond-one"></div>
-            <div className="out-take diamond-two"></div>
-            <div className="out-take diamond-three"></div>
-            <div className="out-take diamond-four"></div>
-          </>
-        }
-    
-        const clubs = () => {
-          return <>
-            <div className="club-circle club-one"></div>
-            <div className="club-circle club-two"></div>
-            <div className="club-circle club-three"></div>
-            <div className="club-circle club-four"></div>
-            <div className="clubStem"></div>
-          </>
-        }
-    
-        return <div className={`bg-gray-600 flex flex-col w-[80px] h-[120px] rounded-md border-[1px] border-white`}>
-          <div className="relative left-1 text-sm  font-bold top-1">{num}</div>
-          <div className={`absolute w-[80px] top-[20px] h-[80px]`}>
-            {suit === "spades" ? <div className="absolute left-[17.5px] w-[100%] h-[100%] top-[30px]">{spade()}</div> : suit === "hearts" ? <div className="left-[17px] top-[21px] w-[100%] h-[100%] absolute">{hearts()}</div> : suit === "diamonds" ? <div className="absolute left-[10px] top-[15.5px] w-[100%] h-[100%]">{diamonds()}</div> : <div className="absolute left-[-1px] top-[15px] w-[100%] h-[100%]">{clubs()}</div>}
-          </div>
-        </div>
-      }
 
     const cardFetch = (type, num) => {
         let suit
@@ -128,12 +72,11 @@ export default function page({serverObject, playerNum}) {
           card = player_cards[cardNum + 1]
         }
         return cardFunct(suit, card); 
-      }
-    const currentStack = stackSize - contributions
+    }
+
     return <>
     <button onClick={leaveFunct} className="w-[10vw] h-[7.5vh] relative left-[1vw] top-[1vh] bg-[#616161] bg-opacity-90 rounded-2xl">Leave</button>
       <div className="w-[100vw] absolute top-[57.5vh] h-[30vh]">
-          <div className="text-white w-[5vw] absolute -top-[20vh] left-0">MB{serverObject.min_bet }{" "}T { serverObject.turn }{" "}R{ serverObject.round }{" "}BB {serverObject.big_blind}{" "}{ JSON.stringify(serverObject.stack_sizes)}{JSON.stringify(serverObject.contributions)}</div>
         <div id="your-hand" className="mx-auto w-[120px] h-[100%]">
           <div className="relative -rotate-[10deg] mx-auto -left-[30px] z-10 -top-[10px] w-[80px]">{cardFetch("player_cards",1)}</div>
           <div className="relative rotate-[10deg] mx-auto -top-[130px] z-10 left-[30px] w-[80px]">{cardFetch("player_cards",2)}</div>
@@ -150,9 +93,9 @@ export default function page({serverObject, playerNum}) {
                   <button onClick={() => {bet > minBet + 50  ? setBet(bet - 50) : setBet(minBet + 50)}} className={`relative pb-3 top-[5vh] rounded-lg border-2  w-[4vw] h-[4vh] border-gray-700 bg-gray-500 ${menuOpen ? "block" : "hidden"}`}>
                     -50
                   </button>
-                  <button className={`relative pb-2 top-[5vh] rounded-lg border-2 border-gray-800  w-[4vw] transition-opacity ease-out duration-75 delay-50 ${menuOpen ? " h-[4vh] opacity-100 z-20" : load ? "h-0 top-0 opacity-0" : "opacity-0 h-0 top-0"}`}>
+                  <div className={`relative text-center pb-2 top-[5vh] font-bold  w-[4vw] transition-opacity ease-out duration-75 delay-50 ${menuOpen ? " h-[4vh] opacity-100 z-20" : load ? "h-0 top-0 opacity-0" : "opacity-0 h-0 top-0"}`}>
                     {bet > Number(minBet) + 50 ? bet : minBet  +50}
-                  </button>
+                  </div>
                   <button onClick={() => {stackSize > contributions + 50 + bet ? setBet(bet + 50) : setBet(stackSize - contributions)}} className={`relative pb-3 top-[5vh] rounded-lg border-2  w-[4vw] h-[4vh] border-gray-700 bg-gray-500 ${menuOpen ? "block" : "hidden"}`}>
                     +50
                     <div className="absolute -top-96 left-0">{}</div>

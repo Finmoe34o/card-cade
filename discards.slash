@@ -1,0 +1,14 @@
+    /*useEffect(() => {
+      if (stackSize === undefined || stackSize === null || JSON.stringify(stackSize) === `null`) {
+          if (localStorage.getItem("stackSize") === null || Number(localStorage.getItem("stackSize")) <= 0) {
+            localStorage.setItem("stackSize", "10000")
+          }
+          setStackSize(10000)
+          setStackSize(Number(localStorage.getItem("stackSize")))
+      }
+      if((bigBlind === 5 && turn === 1 && round === 5) || (turn === bigBlind + 1 && round === 1)) { 
+        localStorage.setItem("stackSize",`${stackSize}`)
+      }
+    }, [serverObject.turn])*/
+
+    //<div className="text-white w-[5vw] absolute -top-[20vh] left-0">MB{serverObject.min_bet }{" "}T { serverObject.turn }{" "}R{ serverObject.round }{" "}BB {serverObject.big_blind}{" "}{ JSON.stringify(serverObject.stack_sizes)}{JSON.stringify(serverObject.contributions)}</div>

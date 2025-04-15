@@ -276,9 +276,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
         }
     }
 
-    if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && last)) {
+    if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && last) && activePlayers.length > 1) {
         turn === 5 ? turn = 1 : turn++
-        while (!activePlayers.includes(Number(turn)) && !playerArr.includes(Number(turn)) && activePlayers.length > 0 && round > 1) {
+        while (!activePlayers.includes(Number(turn)) && !playerArr.includes(Number(turn))) {
             turn === 5 ? turn = 1 : turn++
         }
         const { data, error } = await supabase
@@ -287,12 +287,11 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
             .eq("id", serverNum)
     }
     else {
-
-        if (round === Number(1)) {
+        if (round === Number(1) && activePlayers.length > 1) {
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
             round++
 
-        } else if (round < 4) {
+        } else if (round < 4 && activePlayers.length > 1) {
             big_Blind > 2 ? turn = big_Blind - 2 : big_Blind = 5 + big_Blind - 2
             round++
         } else {
@@ -429,10 +428,9 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
 
 }
 
-const supabase = await createClient();
-let { data: servers } = await supabase.from('servers').select("*");
 
-const newServer = async (newServer) => {
+
+const newServer = async (newServer, supabase) => {
     const { error } = await supabase
         .from('servers')
         .insert([
@@ -448,7 +446,7 @@ const newServer = async (newServer) => {
     if (error) console.error("Error inserting server:", error);
 };
 
-const iteratePlayerNum = async (playerNum, serverNum) => {
+const iteratePlayerNum = async (playerNum, serverNum, supabase) => {
     const playerArr = await servers[serverNum - 1].players
     playerArr.push(playerNum)
     await supabase
@@ -458,6 +456,8 @@ const iteratePlayerNum = async (playerNum, serverNum) => {
 };
 
 export const findServer = async () => {
+    const supabase = await createClient();
+    let { data: servers } = await supabase.from('servers').select("*");
     let serverNum, playerNum;
     for (let i = 0; i < servers.length; i++) {
         if (servers[i].players.length < 5) {
@@ -472,10 +472,10 @@ export const findServer = async () => {
         }
     }
     if (serverNum === undefined) {
-        await newServer(servers.length + 1);
+        await newServer(servers.length + 1, supabase);
         serverNum = servers.length + 1;
     }
-    iteratePlayerNum(playerNum, serverNum);
+    iteratePlayerNum(playerNum, serverNum, supabase);
     if (servers[serverNum - 1].players === 1) {
         await supabase
             .from('servers')
@@ -484,7 +484,7 @@ export const findServer = async () => {
                     players: 1,
                     river: '{}',
                     player_cards: '{}',
-                    stack_sizes: '{}'
+                    stack_sizes: '{1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000}'
                 },
             ])
             .eq("id", serverNum);
