@@ -485,19 +485,5 @@ export const findServer = async () => {
     else {
         iteratePlayerNum(playerNum, serverNum, supabase, servers);
     }
-
-    /*if (servers[serverNum - 1].players.length === 1) {
-        await supabase
-            .from('servers')
-            .update([
-                {
-                    players: 1,
-                    river: '{}',
-                    player_cards: '{}',
-                    stack_sizes: '{1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000}'
-                },
-            ])
-            .eq("id", serverNum);
-    }*/
     return `/${serverNum}/${playerNum}`;
 };
