@@ -438,45 +438,55 @@ const newServer = async (newServer, supabase) => {
                 players: [1],
                 river: '{}',
                 player_cards: '{}',
-                stack_sizes: { 1: null, 2: null, 3: null, 4: null, 5: null }
+                stack_sizes: { 1: 10000, 2: 10000, 3: 10000, 4: 10000, 5: 10000 }
             },
         ])
         .eq("id", newServer);
 
     if (error) console.error("Error inserting server:", error);
+    return
 };
 
-const iteratePlayerNum = async (playerNum, serverNum, supabase) => {
-    const playerArr = await servers[serverNum - 1].players
+const iteratePlayerNum = async (playerNum, serverNum, supabase, servers) => {
+    const playerArr = playerNum === 1 ? [1] : await servers[serverNum - 1].players
     playerArr.push(playerNum)
     await supabase
-        .from('servers')
+        .from("servers")
         .update({ players: playerArr })
-        .eq("id", serverNum);
+        .eq("id", serverNum)
 };
 
 export const findServer = async () => {
     const supabase = await createClient();
     let { data: servers } = await supabase.from('servers').select("*");
-    let serverNum, playerNum;
-    for (let i = 0; i < servers.length; i++) {
+    let serverNum, playerNum, newServerCheck
+    for (let i = 0; i < servers.length + 1; i++) {
+        if (servers[i] === undefined) {
+            newServerCheck = true
+            serverNum = i + 1
+            break;
+        }
         if (servers[i].players.length < 5) {
-            serverNum = servers[i].id;
-            for (let i = 1; i < 6; i++) {
-                if (!servers[serverNum - 1].players.includes(i)) {
-                    playerNum = i
+            serverNum === undefined ? serverNum = servers[i].id : null
+            for (let j = 1; j < 6; j++) {
+                if (!servers[serverNum - 1].players.includes(j)) {
+                    playerNum = j
                     break;
                 }
             }
             break;
         }
     }
-    if (serverNum === undefined) {
+    if (newServerCheck) {
         await newServer(servers.length + 1, supabase);
-        serverNum = servers.length + 1;
+        playerNum = 1
+        //await iteratePlayerNum(playerNum, servers.length + 1, supabase, servers)
     }
-    iteratePlayerNum(playerNum, serverNum, supabase);
-    if (servers[serverNum - 1].players === 1) {
+    else {
+        iteratePlayerNum(playerNum, serverNum, supabase, servers);
+    }
+
+    /*if (servers[serverNum - 1].players.length === 1) {
         await supabase
             .from('servers')
             .update([
@@ -488,7 +498,6 @@ export const findServer = async () => {
                 },
             ])
             .eq("id", serverNum);
-    }
-
+    }*/
     return `/${serverNum}/${playerNum}`;
 };
