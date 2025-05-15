@@ -8,7 +8,7 @@ import cardFunct from "./cardFunct"
 export default function page({serverObject, playerNum}) {
     const [bet, setBet] = useState(0)
     const [menuOpen, setMenuOpen] = useState(false)
-    const [load, setLoad] = useState(false)
+    const [load, setLoad] = useState(false) 
     const router = useRouter();
     const pNum = Number(playerNum)
     let round = Number(serverObject.round)
@@ -18,10 +18,10 @@ export default function page({serverObject, playerNum}) {
     const player_cards = serverObject.player_cards
     const contributions = Number(serverObject.contributions[playerNum])
     let minBet = serverObject.min_bet - contributions
-    const numOfPlayers = serverObject.players
+    const numOfPlayers = serverObject.players !== undefined ? serverObject.players.length: console.error("no player arr")
     const river = serverObject.river
     const bigBlind = Number(serverObject.big_blind)
-    bigBlind === playerNum ? setBet(50) : bigBlind - 1 === playerNum ? setBet(25) : null
+    bigBlind && bet === 0 === playerNum ? setBet(50) : bigBlind - 1 === playerNum && bet === 0 && round === 1 ? setBet(25) : null
     const currentStack = stackSize - contributions
 
     useEffect(() => {
@@ -108,19 +108,19 @@ export default function page({serverObject, playerNum}) {
       </div>
       <div className="w-[100vw] h-[100vh]">
         <div className=" absolute left-[15vw] top-[65vh]">
-          <div className={`${numOfPlayers >= 2 ? "block" : "block"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 2 ? "block" : "hidden"} ${Number(playerNum) < 5 ? turn === Number(playerNum) + 1 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 4 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 5 ? serverObject.big_blind === pNum + 1 ? "block": "hidden": serverObject.big_blind === pNum - 4? "block": "hidden" }`}>BB</div>
         </div>
         <div className="absolute left-[15vw] top-[9vh]">
-          <div className={`${numOfPlayers >= 3 ? "block" : "block"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 3 ? "block" : "hidden"} ${Number(playerNum) < 4 ? turn === Number(playerNum) + 2 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 3 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 4 ? serverObject.big_blind === pNum + 2 ? "block": "hidden": serverObject.big_blind === pNum - 3? "block": "hidden" }`}>BB</div>
         </div>
         <div className="absolute right-[15vw] top-[9vh]">
-          <div className={`${numOfPlayers >= 4 ? "block" : "block"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 4 ? "block" : "hidden"} ${Number(playerNum) < 3 ? turn === Number(playerNum) + 3 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 2 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 3 ? serverObject.big_blind === pNum + 3 ? "block": "hidden": serverObject.big_blind === pNum - 2? "block": "hidden" }`}>BB</div>
         </div>
         <div className="absolute right-[15vw] top-[65vh]">
-          <div className={`${numOfPlayers >= 5 ? "block" : "block"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
+          <div className={`${numOfPlayers >= 5 ? "block" : "hidden"} ${Number(playerNum) < 2 ? turn === Number(playerNum) + 4 ? "border-[6px] animate-pulse border-green-400" : "border-[1px]" : turn  === Number(playerNum) - 1 ? "border-[6px] animate-pulse border-green-500" : "border-[1px]"} bg-gray-600 flex flex-col w-[120px] h-[120px] rounded-full border-[1px] border-white`}></div>
           <div className={`absolute left-[5.5vw] top-[13vh] bg-lime-400 w-[3vw] h-[3vw] rounded-full text-gray-900 m-auto text-center py-[9px] font-bold ${pNum < 2 ? serverObject.big_blind === pNum + 4 ? "block": "hidden": serverObject.big_blind === pNum - 1? "block": "hidden" }`}>BB</div>
         </div>
       </div>

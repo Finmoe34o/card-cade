@@ -101,6 +101,10 @@ const config = {
         "comeDown": "comeDown 0.15s ease-out",
         "comeUp": "comeUp 0.2s ease-in"
       },
+      screens: {
+        "400px"  : "400px",
+        "500px" : "500px"
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
