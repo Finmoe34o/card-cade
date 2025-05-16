@@ -267,6 +267,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
 
 
     let last
+    //think used to determine last
     for (let i = 0; i < 5; i++) {
         let blob = big_Blind - (2 + i);
         blob < 1 ? last = 5 + blob : last = blob
@@ -276,6 +277,8 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
         }
     }
 
+
+    //if increments turn or next round
     if ((Number(round) === 1 && Number(turn) !== Number(big_Blind)) || (round > 1 && last) && activePlayers.length > 1) {
         turn === 5 ? turn = 1 : turn++
         while (!activePlayers.includes(Number(turn)) && !playerArr.includes(Number(turn))) {
@@ -286,6 +289,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
             .update({ "turn": turn })
             .eq("id", serverNum)
     }
+    //new round
     else {
         if (round === Number(1) && activePlayers.length > 1) {
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
@@ -295,6 +299,7 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
             big_Blind > 2 ? turn = big_Blind - 2 : big_Blind = 5 + big_Blind - 2
             round++
         } else {
+            //reset
             round = 1
             big_Blind === 5 ? big_Blind = 1 : big_Blind++
             big_Blind === 5 ? turn = 1 : turn = big_Blind + 1
@@ -310,7 +315,6 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
                     const hand1 = [serverObject.player_cards[(index - 1) * 5], (serverObject.player_cards[(index - 1) * 5 + 1]), (serverObject.player_cards[(index - 1) * 5 + 2]), (serverObject.player_cards[(index - 1) * 5 + 3])]
                     const hand2 = [serverObject.player_cards[(index) * 5], (serverObject.player_cards[(index) * 5 + 1]), (serverObject.player_cards[(index) * 5 + 2]), (serverObject.player_cards[(index) * 5 + 3])]
                     const value1 = cardCheck(river, hand1)
-                    const value2 = cardCheck(river, hand2)
                     obj[index] = await comparison(value1)
                 }
                 let bestNum
@@ -411,7 +415,12 @@ export async function sendValuesToServer(bet, serverObject, playerNum, pStackSiz
                 index++;
             }
             roundRestart()
+            empty = false
             let t = big_Blind === 5 ? 1 : big_Blind + 1
+            while (!playerArr.includes(t) || empty) {
+                t < 4 ? t++ : t = 1
+                t === big_Blind ? empty = true : null
+            }
             contributions = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }
             contributions[big_Blind] = 50
             big_Blind === 1 ? contributions[5] = 25 : contributions[big_Blind - 1] = 25
